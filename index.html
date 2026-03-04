@@ -1,0 +1,3000 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>婚礼管家 移动端独立版 v11</title>
+<meta name="theme-color" content="#111827" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<style>
+:root{
+  --bg:#f3f5f9;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --brand:#111827;
+  --brand-soft:#eef2ff;
+  --accent:#2563eb;
+  --success:#16a34a;
+  --danger:#dc2626;
+  --warning:#d97706;
+  --radius:22px;
+  --shadow:0 10px 30px rgba(17,24,39,.08);
+  --top-h:64px;
+  --bottom-h:78px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;}
+body{
+  min-height:100vh;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+button,input,select,textarea{font:inherit;}
+button{cursor:pointer;}
+input,select,textarea{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px 14px;
+  background:#fff;
+  color:var(--text);
+  min-height:48px;
+}
+textarea{min-height:112px;resize:vertical;}
+.hidden,[hidden]{display:none !important;}
+body.sheet-open,body.modal-open{overflow:hidden;}
+
+.topBar{
+  position:fixed;
+  top:0; left:0; right:0;
+  height:calc(var(--top-h) + env(safe-area-inset-top));
+  padding:env(safe-area-inset-top) 12px 0;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(229,231,235,.9);
+  z-index:30;
+}
+.topBarInner{
+  height:var(--top-h);
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+}
+.brandMini{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+.brandMini .logo{
+  width:38px;height:38px;border-radius:14px;
+  display:grid;place-items:center;
+  background:#111827;color:#fff;font-size:18px;
+  flex:0 0 auto;
+}
+.brandText{min-width:0;}
+.brandText .name{font-size:14px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;outline:none;cursor:text;}
+.brandText .name[contenteditable="true"]:focus{box-shadow:inset 0 -2px 0 rgba(79,70,229,.22);}
+.brandText .sub{font-size:11px;color:var(--muted);line-height:1.1;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.currentTitle{
+  text-align:center;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.topActions{display:flex;align-items:center;gap:8px;justify-content:flex-end;}
+.chip{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:34px;padding:0 10px;border-radius:999px;
+  background:var(--brand-soft);color:#334155;font-size:12px;font-weight:700;
+}
+.iconBtn,.primaryBtn,.ghostBtn,.dangerBtn{
+  min-height:46px;border:none;border-radius:16px;padding:0 14px;font-weight:800;
+}
+.iconBtn{background:#111827;color:#fff;min-width:46px;padding:0 12px;}
+.primaryBtn{background:var(--accent);color:#fff;}
+.ghostBtn{background:#fff;border:1px solid var(--line);color:var(--text);}
+.dangerBtn{background:#fee2e2;color:var(--danger);}
+.smallBtn{min-height:40px;padding:0 12px;border-radius:14px;font-size:13px;font-weight:700;}
+
+.app{
+  padding:calc(var(--top-h) + env(safe-area-inset-top) + 14px) 14px calc(var(--bottom-h) + env(safe-area-inset-bottom) + 16px);
+  max-width:980px;
+  margin:0 auto;
+}
+.screen{display:none;}
+.screen.active{display:block;}
+.stack{display:grid;gap:14px;}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px;
+}
+.cardTitle{font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.cardSub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;}
+.statGrid,.actionGrid,.eventGrid,.listGrid,.quickGrid{display:grid;gap:12px;}
+.statGrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+.statItem{
+  background:linear-gradient(180deg,#f8fafc,#eef2ff);
+  border-radius:18px;padding:14px;
+}
+.statItem .label{font-size:12px;color:#475569;}
+.statItem .value{font-size:26px;font-weight:900;margin-top:8px;}
+.actionGrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+.actionBtn{
+  min-height:84px;border:none;border-radius:20px;padding:14px;text-align:left;
+  background:#fff;border:1px solid var(--line);box-shadow:0 8px 22px rgba(17,24,39,.05);
+}
+.actionBtn .title{font-size:14px;font-weight:800;}
+.actionBtn .desc{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45;}
+.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;background:#f3f4f6;color:#374151;}
+.badge.green{background:#dcfce7;color:#166534;}
+.badge.orange{background:#ffedd5;color:#9a3412;}
+.badge.blue{background:#dbeafe;color:#1d4ed8;}
+.list{display:grid;gap:10px;margin-top:12px;}
+.listItem{
+  border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff;
+  display:grid;gap:10px;
+}
+.listHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.listMain{min-width:0;}
+.listMain .name{font-size:15px;font-weight:800;line-height:1.35;}
+.listMain .meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.listMeta{display:flex;flex-wrap:wrap;gap:8px;}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.emptyState{
+  border:1px dashed #cbd5e1;border-radius:18px;padding:18px;text-align:center;color:var(--muted);background:#fff;
+}
+.timeline{display:grid;gap:10px;margin-top:12px;}
+.timelineItem{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:start;}
+.timelineTime{font-size:11px;font-weight:800;color:#334155;padding-top:2px;}
+.timelineCard{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px;}
+.timelineCard .tTitle{font-weight:800;font-size:13px;}
+.timelineCard .tDesc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.45;}
+.checkList{display:grid;gap:8px;margin-top:10px;}
+.checkRow{
+  display:flex;gap:8px;align-items:flex-start;justify-content:space-between;border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px;
+}
+.checkMain{display:flex;gap:8px;align-items:flex-start;flex:1;min-width:0;cursor:pointer;}
+.checkRow input[type="checkbox"]{width:18px;height:18px;min-height:18px;accent-color:var(--accent);margin-top:2px;flex:0 0 auto;}
+.checkLabel{font-size:13px;font-weight:700;line-height:1.35;}
+.checkHint{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.rowEditBtn{flex:0 0 auto;min-height:32px;padding:0 9px;border-radius:11px;font-size:11px;font-weight:800;}
+.checkGroupTitle{font-size:12px;font-weight:900;color:#334155;margin:4px 2px -2px;padding-top:6px;}
+.checkGroupHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 1px -1px;padding-top:4px;}
+.checkGroupHead .checkGroupTitle{margin:0;padding-top:0;}
+.checkGroupAddBtn,.inlineActionBtn{min-height:30px;padding:0 9px;border:none;border-radius:999px;background:#e0e7ff;color:#3730a3;font-size:11px;font-weight:800;}
+.checkInlineEditor{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:16px;padding:12px;display:grid;gap:10px;}
+.inlineField{display:grid;gap:6px;}
+.inlineField label{font-size:12px;font-weight:800;color:#475569;}
+.inlineActions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;}
+.clientSearchWrap{margin-top:14px;}
+.clientSearchMeta{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5;}
+.monthBlock{display:grid;gap:10px;margin-top:14px;}
+.monthHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:16px;background:#eef2ff;border:1px solid #dbeafe;}
+.monthHead .title{font-size:14px;font-weight:900;color:#1e3a8a;}
+.monthHead .meta{font-size:12px;color:#475569;margin-top:4px;line-height:1.5;}
+.rowActionGroup{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center;flex:0 0 auto;}
+.rowAddBtn,.timelineActionBtn{min-height:34px;padding:0 10px;border:none;border-radius:999px;background:#e0e7ff;color:#3730a3;font-size:12px;font-weight:800;}
+.timelineRowCard{display:grid;gap:8px;}
+.timelineRowActions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;}
+.timelineInlineEditor{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:16px;padding:12px;display:grid;gap:10px;}
+
+.bottomNav{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+  z-index:28;
+}
+.bottomNavInner{
+  max-width:760px;margin:0 auto;
+  background:rgba(17,24,39,.94);
+  color:#fff;border-radius:24px;
+  padding:8px;
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;
+  box-shadow:0 16px 36px rgba(17,24,39,.22);
+}
+.navBtn{
+  min-height:54px;border:none;border-radius:18px;background:transparent;color:rgba(255,255,255,.76);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+}
+.navBtn .icon{font-size:18px;line-height:1;}
+.navBtn .label{font-size:11px;font-weight:700;line-height:1;}
+.navBtn.active{background:rgba(255,255,255,.12);color:#fff;}
+
+.sheetBackdrop,.modalBackdrop{
+  position:fixed;inset:0;background:rgba(15,23,42,.46);display:flex;align-items:flex-end;justify-content:center;
+  z-index:40;padding:14px;
+}
+.sheetBackdrop[aria-hidden="true"],.modalBackdrop[aria-hidden="true"]{display:none;}
+.sheet{
+  width:min(760px,100%);max-height:min(86vh,900px);overflow:auto;background:#fff;border-radius:26px 26px 18px 18px;
+  box-shadow:0 24px 48px rgba(15,23,42,.22);
+}
+.sheetHeader,.modalHead{
+  position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line);padding:14px 16px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+}
+.sheetTitle,.modalTitle{font-size:16px;font-weight:900;}
+.sheetDesc,.modalDesc{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;}
+.sheetBody{padding:14px 16px 18px;}
+.sheetGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.sheetAction{border:none;border-radius:18px;padding:14px;text-align:left;background:#f8fafc;border:1px solid var(--line);}
+.sheetAction .aTitle{font-size:14px;font-weight:800;}
+.sheetAction .aDesc{font-size:12px;color:var(--muted);line-height:1.45;margin-top:6px;}
+
+.modal{
+  width:min(980px,100%);max-height:min(92vh,980px);overflow:hidden;background:#fff;border-radius:28px;box-shadow:0 24px 48px rgba(15,23,42,.22);
+  display:flex;flex-direction:column;
+}
+.modalBody{padding:14px 16px;overflow:auto;display:grid;gap:14px;}
+.stepper{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.stepDot{
+  border:none;border-radius:16px;padding:10px 8px;background:#f3f4f6;color:#6b7280;font-size:12px;font-weight:800;
+}
+.stepDot.active{background:#111827;color:#fff;}
+.stepPane{display:none;}
+.stepPane.active{display:block;}
+.fieldGrid{display:grid;gap:12px;grid-template-columns:1fr;}
+.fieldGrid.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));}
+.fieldGrid.threeCol{grid-template-columns:repeat(3,minmax(0,1fr));}
+.field label{display:block;font-size:12px;font-weight:800;color:#475569;margin-bottom:8px;}
+.helper{font-size:12px;color:var(--muted);line-height:1.5;}
+.modalFoot{
+  border-top:1px solid var(--line);padding:14px 16px;background:#fff;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;
+}
+
+.filterBar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.filterBtn{border:none;border-radius:999px;padding:8px 12px;background:#e5e7eb;color:#374151;font-size:12px;font-weight:800;}
+.filterBtn.active{background:#111827;color:#fff;}
+
+.notice{border-radius:18px;background:#f8fafc;border:1px solid var(--line);padding:14px;font-size:13px;line-height:1.6;color:#334155;}
+.kv{display:grid;gap:10px;margin-top:12px;}
+.kvRow{display:flex;justify-content:space-between;gap:12px;font-size:13px;}
+.kvRow .k{color:var(--muted);} .kvRow .v{font-weight:800;text-align:right;}
+
+.headerLegacy,.tabsLegacy{display:none !important;}
+
+@media (max-width:820px){
+  .fieldGrid.threeCol,.fieldGrid.twoCol{grid-template-columns:1fr;}
+}
+@media (min-width:768px){
+  .app{padding-left:20px;padding-right:20px;}
+  .statGrid{grid-template-columns:repeat(4,minmax(0,1fr));}
+  .actionGrid{grid-template-columns:repeat(4,minmax(0,1fr));}
+  .quickGrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .sheetGrid{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media (min-width:980px){
+  body.foldWide .stack.twoCol{grid-template-columns:1.05fr .95fr;align-items:start;}
+  body.foldWide .modal{height:min(90vh,980px);}
+}
+@media (max-width:420px){
+  .brandText .sub,.chip.smallHide{display:none;}
+  .currentTitle{font-size:14px;}
+  .sheetGrid{grid-template-columns:1fr;}
+  .actionGrid{grid-template-columns:1fr;}
+  .bottomNavInner{gap:4px;padding:6px;}
+  .navBtn .label{font-size:10px;}
+}
+</style>
+</head>
+<body>
+  <header class="topBar">
+    <div class="topBarInner">
+      <div class="brandMini">
+        <div class="logo">💍</div>
+        <div class="brandText">
+          <div class="name" id="brandNameDisplay" contenteditable="true" spellcheck="false" role="textbox" aria-label="管家名字">婚礼管家</div>
+          <div class="sub">手机 / 平板 / 翻盖 / 联动增强</div>
+        </div>
+      </div>
+      <div class="currentTitle" id="currentTitle">首页</div>
+      <div class="topActions">
+        <span class="chip smallHide" id="saveChip">未保存</span>
+        <button class="iconBtn" id="saveBtn" aria-label="保存">保存</button>
+        <button class="iconBtn" id="menuBtn" aria-label="更多">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="screen active" id="screen-dashboard">
+      <div class="stack">
+        <div class="card">
+          <div class="cardTitle">移动端工作首页 <span class="badge blue" id="deviceBadge">自动识别中</span></div>
+          <div class="cardSub">这一版继续优化移动端：左上角名字可直接改、模板库支持折叠收起，清单与中枢继续保持紧凑布局。</div>
+          <div class="statGrid" id="statsGrid" style="margin-top:14px"></div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitle">快捷操作</div>
+          <div class="actionGrid" style="margin-top:14px">
+            <button class="actionBtn" data-quick="new-event">
+              <div class="title">新增档期</div>
+              <div class="desc">四步录入，手机全屏编辑。</div>
+            </button>
+            <button class="actionBtn" data-quick="workspace">
+              <div class="title">执行中枢</div>
+              <div class="desc">当天时间轴、风险提醒、团队状态集中查看。</div>
+            </button>
+            <button class="actionBtn" data-quick="customs">
+              <div class="title">风俗方案</div>
+              <div class="desc">按地区与流程自动生成节点提醒。</div>
+            </button>
+            <button class="actionBtn" data-quick="data-center">
+              <div class="title">数据中心</div>
+              <div class="desc">导入、导出、本地备份。</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitle">最近档期</div>
+          <div id="recentEvents"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-workspace">
+      <div class="stack twoCol">
+        <div class="card">
+          <div class="cardTitle">执行中枢</div>
+          <div class="cardSub">把当天档期、客户信息、关键时间和工作人员信息集中到一个页面，现场切换更快。</div>
+          <div id="workspaceHero" style="margin-top:14px"></div>
+          <div id="workspaceClientInfo" class="kv" style="margin-top:14px"></div>
+          <div id="workspaceOps" style="margin-top:14px"></div>
+          <div class="cardTitle" style="margin-top:14px">时间流程清单</div>
+          <div class="cardSub">顶部统一添加，下面每个时间段支持删除和编辑，不跳出新窗口，现场临时改动更快。</div>
+          <div class="timeline" id="workspaceTimeline"></div>
+        </div>
+        <div class="card">
+          <div class="cardTitle">中枢提醒</div>
+          <div class="cardSub">这里会结合当天客户、清单进度和地区风俗，给出执行缺口与应急提示。</div>
+          <div id="workspaceAlerts" style="margin-top:14px"></div>
+          <div class="cardTitle" style="margin-top:14px">工作人员流程清单</div>
+          <div class="checkList" id="workspaceStaffChecklist"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-customs">
+      <div class="stack twoCol">
+        <div class="card">
+          <div class="cardTitle">当前档期风俗流程</div>
+          <div class="cardSub">优先读取当前档期地区对应的风俗库，再叠加堵门 / 敬茶 / 回门与当天流程节点。</div>
+          <div id="customsPlan" style="margin-top:14px"></div>
+        </div>
+        <div class="card">
+          <div class="cardTitle">地区风俗库</div>
+          <div class="cardSub">可按地区维护风俗内容：切换地区查看、手动新增地区，并继续往地区里追加风俗节点。</div>
+          <div id="customsNotes" style="margin-top:14px"></div>
+          <div class="fieldGrid twoCol" style="margin-top:14px">
+            <div class="field">
+              <label for="customsRegionSelect">当前管理地区</label>
+              <select id="customsRegionSelect"></select>
+            </div>
+            <div class="field">
+              <label for="newRegionName">新增地区</label>
+              <div class="toolbar">
+                <input id="newRegionName" placeholder="例如：潮汕 / 连云港 / 客户自定义地区" />
+                <button class="primaryBtn smallBtn" type="button" id="addRegionBtn">添加地区</button>
+              </div>
+            </div>
+          </div>
+          <div class="field" style="margin-top:10px">
+            <label for="newCustomTitle">新增风俗内容</label>
+            <input id="newCustomTitle" placeholder="例如：进门先拜长辈 / 上头礼 / 女方开门口彩" />
+          </div>
+          <div class="field" style="margin-top:10px">
+            <label for="newCustomHint">风俗说明</label>
+            <textarea id="newCustomHint" placeholder="填写执行提醒、顺序、禁忌、站位或口播注意点"></textarea>
+          </div>
+          <div class="toolbar" style="margin-top:10px">
+            <button class="primaryBtn smallBtn" type="button" id="addCustomBtn">添加到当前地区</button>
+          </div>
+          <div class="cardTitle" style="margin-top:14px">地区风俗清单</div>
+          <div id="customsLibraryList" style="margin-top:14px"></div>
+          <div class="cardTitle" style="margin-top:14px">当前档期执行勾选</div>
+          <div class="checkList" id="customsChecklist"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-schedule">
+      <div class="stack">
+        <div class="card">
+          <div class="cardTitle">档期管理 <button class="primaryBtn smallBtn" id="addEventBtnTop">新增</button></div>
+          <div class="cardSub">按月份自动归档显示，直接看到几月份有哪些客户与对应档期。</div>
+          <div class="filterBar">
+            <button class="filterBtn active" data-filter="all">全部</button>
+            <button class="filterBtn" data-filter="upcoming">待执行</button>
+            <button class="filterBtn" data-filter="done">已完成</button>
+          </div>
+          <div id="scheduleList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-clients">
+      <div class="stack">
+        <div class="card">
+          <div class="cardTitle">客户资料</div>
+          <div class="field clientSearchWrap">
+            <input id="clientSearchInput" placeholder="搜索姓名 / 电话 / 婚期（如 2026-03-18）" />
+          </div>
+          <div id="clientSearchMeta" class="clientSearchMeta"></div>
+          <div id="clientList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-checklist">
+      <div class="stack">
+        <div class="card">
+          <div class="cardTitle">当前客户联动清单</div>
+          <div id="checklistClientHero" style="margin-top:14px"></div>
+          <div class="checkList" id="currentChecklist"></div>
+        </div>
+        <div class="card">
+          <div class="cardTitle">基础模板库 <button class="ghostBtn smallBtn" type="button" id="templateToggleBtn">展开</button></div>
+          <div id="templateLibraryBody" hidden>
+            <div class="checkList" id="templateChecklist"></div>
+            <div class="toolbar" style="margin-top:14px">
+              <button class="ghostBtn smallBtn" id="resetChecklistBtn">重置模板</button>
+              <button class="primaryBtn smallBtn" id="copyChecklistBtn">同步到当前档期</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottomNav" aria-label="主导航">
+    <div class="bottomNavInner">
+      <button class="navBtn active" data-screen="dashboard"><span class="icon">🏠</span><span class="label">首页</span></button>
+      <button class="navBtn" data-screen="schedule"><span class="icon">📅</span><span class="label">档期</span></button>
+      <button class="navBtn" data-screen="workspace"><span class="icon">🧭</span><span class="label">中枢</span></button>
+      <button class="navBtn" data-screen="customs"><span class="icon">🎎</span><span class="label">风俗</span></button>
+      <button class="navBtn" data-screen="clients"><span class="icon">👥</span><span class="label">客户</span></button>
+      <button class="navBtn" data-screen="checklist"><span class="icon">✅</span><span class="label">清单</span></button>
+    </div>
+  </nav>
+
+  <div class="sheetBackdrop" id="menuSheet" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="menuSheetTitle">
+      <div class="sheetHeader">
+        <div>
+          <div class="sheetTitle" id="menuSheetTitle">更多功能</div>
+          <div class="sheetDesc">把桌面端分散在顶部的功能，收口到移动端底部面板里。</div>
+        </div>
+        <button class="ghostBtn smallBtn" id="closeMenuSheet">关闭</button>
+      </div>
+      <div class="sheetBody">
+        <div class="sheetGrid">
+          <button class="sheetAction" data-sheet-action="new-event"><div class="aTitle">新增档期</div><div class="aDesc">打开全屏录入。</div></button>
+          <button class="sheetAction" data-sheet-action="save"><div class="aTitle">保存</div><div class="aDesc">立即写入本地存储。</div></button>
+          <button class="sheetAction" data-sheet-action="export"><div class="aTitle">导出数据</div><div class="aDesc">导出 JSON 备份。</div></button>
+          <button class="sheetAction" data-sheet-action="import"><div class="aTitle">导入</div><div class="aDesc">导入之前的数据。</div></button>
+          <button class="sheetAction" data-sheet-action="export-page-image"><div class="aTitle">导出当前页图片</div><div class="aDesc">把你正在看的页面导出成 PNG。</div></button>
+          <button class="sheetAction" data-sheet-action="export-workspace-image"><div class="aTitle">导出客户执行中枢图片</div><div class="aDesc">导出当前客户的执行中枢页面。</div></button>
+          <button class="sheetAction" data-sheet-action="export-checklist-image"><div class="aTitle">导出客户清单图片</div><div class="aDesc">导出当前客户关联清单。</div></button>
+          <button class="sheetAction" data-sheet-action="customs"><div class="aTitle">风俗方案</div><div class="aDesc">跳转到风俗流程页。</div></button>
+          <button class="sheetAction" data-sheet-action="data-center"><div class="aTitle">数据中心</div><div class="aDesc">查看数量与状态。</div></button>
+          <button class="sheetAction" data-sheet-action="about"><div class="aTitle">当前版本</div><div class="aDesc">查看本轮改造说明。</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalBackdrop" id="eventModalWrap" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+      <div class="modalHead">
+        <div>
+          <div class="modalTitle" id="eventModalTitle">新增档期</div>
+          <div class="modalDesc">全屏四步录入，更适合手机、平板、翻盖机。</div>
+        </div>
+        <button class="ghostBtn smallBtn" id="closeEventModalBtn">关闭</button>
+      </div>
+      <div class="modalBody">
+        <div class="stepper" id="eventStepper"></div>
+
+        <div class="stepPane active" data-step="0">
+          <div class="fieldGrid threeCol">
+            <div class="field"><label for="e_date">日期</label><input id="e_date" type="date" /></div>
+            <div class="field"><label for="e_ceremony">仪式开始</label><input id="e_ceremony" type="time" /></div>
+            <div class="field"><label for="e_banquet">宴会类型</label><select id="e_banquet"><option>午宴</option><option>晚宴</option></select></div>
+            <div class="field"><label for="e_venue">酒店 / 场地</label><input id="e_venue" placeholder="如：连云港万怡酒店" /></div>
+            <div class="field"><label for="e_status">状态</label><select id="e_status"><option>待跟进</option><option>已定</option><option>执行中</option><option>已完成</option></select></div>
+            <div class="field"><label for="e_fee">金额</label><input id="e_fee" placeholder="如：6800" /></div>
+          </div>
+          <div class="field" style="margin-top:12px"><label for="e_note">备注</label><textarea id="e_note" placeholder="交通、酒店、注意事项"></textarea></div>
+        </div>
+
+        <div class="stepPane" data-step="1">
+          <div class="fieldGrid twoCol">
+            <div class="field"><label for="g_name">新郎姓名</label><input id="g_name" /></div>
+            <div class="field"><label for="g_phone">新郎电话</label><input id="g_phone" /></div>
+            <div class="field"><label for="g_addr">新郎地址</label><input id="g_addr" /></div>
+            <div class="field"><label for="b_name">新娘姓名</label><input id="b_name" /></div>
+            <div class="field"><label for="b_phone">新娘电话</label><input id="b_phone" /></div>
+            <div class="field"><label for="b_addr">新娘地址</label><input id="b_addr" /></div>
+          </div>
+        </div>
+
+        <div class="stepPane" data-step="2">
+          <div class="fieldGrid twoCol">
+            <div class="field"><label for="e_client">关联客户</label><select id="e_client"></select></div>
+            <div class="field hidden" id="eventNewClientWrap"><label for="e_newClientName">新建客户名称</label><input id="e_newClientName" placeholder="不在客户库时，直接在这里新建" /><div class="helper" style="margin-top:8px">保存档期时会自动写入客户资料库；如果同名客户已存在，会直接复用那条客户。</div></div>
+            <div class="field"><label for="e_region">具体地区</label><input id="e_region" placeholder="如：连云港赣榆" /></div>
+            <div class="field"><label for="e_distance">接亲距离（分钟）</label><input id="e_distance" type="number" min="0" step="5" /></div>
+            <div class="field"><label for="e_door">是否堵门</label><select id="e_door"><option value="1">是</option><option value="0">否</option></select></div>
+            <div class="field"><label for="e_tea">是否敬茶</label><select id="e_tea"><option value="1">是</option><option value="0">否</option></select></div>
+            <div class="field"><label for="e_return">是否回门</label><select id="e_return"><option value="1">是</option><option value="0">否</option></select></div>
+          </div>
+        </div>
+
+        <div class="stepPane" data-step="3">
+          <div class="fieldGrid twoCol">
+            <div class="field"><label for="staff_host">主持人</label><input id="staff_host" /></div>
+            <div class="field"><label for="staff_photo">摄影</label><input id="staff_photo" /></div>
+            <div class="field"><label for="staff_video">摄像</label><input id="staff_video" /></div>
+            <div class="field"><label for="staff_hostArrive">主持到场</label><input id="staff_hostArrive" type="time" /></div>
+            <div class="field"><label for="staff_photoArrive">摄影到场</label><input id="staff_photoArrive" type="time" /></div>
+            <div class="field"><label for="staff_videoArrive">摄像到场</label><input id="staff_videoArrive" type="time" /></div>
+          </div>
+        </div>
+      </div>
+      <div class="modalFoot">
+        <div class="toolbar">
+          <button class="ghostBtn smallBtn" id="prevStepBtn">上一步</button>
+          <button class="ghostBtn smallBtn" id="nextStepBtn">下一步</button>
+        </div>
+        <div class="toolbar">
+          <button class="dangerBtn smallBtn hidden" id="deleteEventBtn">删除档期</button>
+          <button class="primaryBtn smallBtn" id="saveEventBtn">保存档期</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalBackdrop" id="dataCenterWrap" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dataCenterTitle">
+      <div class="modalHead">
+        <div>
+          <div class="modalTitle" id="dataCenterTitle">数据中心</div>
+          <div class="modalDesc">这里是独立版的数据总览、导入导出和重置入口。</div>
+        </div>
+        <button class="ghostBtn smallBtn" id="closeDataCenterBtn">关闭</button>
+      </div>
+      <div class="modalBody">
+        <div class="notice" id="dataCenterSummary">正在读取数据…</div>
+        <div class="toolbar">
+          <button class="primaryBtn smallBtn" id="exportBtn">导出数据</button>
+          <button class="ghostBtn smallBtn" id="importBtn">导入数据</button>
+          <button class="dangerBtn smallBtn" id="clearDataBtn">清空全部</button>
+        </div>
+        <div class="kv" id="dataCenterDetails"></div>
+      </div>
+      <div class="modalFoot">
+        <div class="toolbar">
+          <span class="chip" id="storageModeChip">本地存储</span>
+        </div>
+        <div class="toolbar">
+          <button class="primaryBtn smallBtn" id="doneDataCenterBtn">完成</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="importFile" class="hidden" accept="application/json" />
+
+<script>
+(function(){
+  var STORAGE_KEY = 'wedding-butler-mobile-standalone-v2';
+  var CHECK_TEMPLATE = [
+    { id:'groom_docs', phase:'男方准备', label:'男方证件与红包', hint:'身份证、婚车红包、开门红包、改口红包分开放。' },
+    { id:'groom_suit', phase:'男方准备', label:'男方服装与胸花', hint:'西装、领结、皮鞋、胸花、备用袜与定妆检查。' },
+    { id:'groom_team', phase:'男方准备', label:'男方兄弟团分工', hint:'谁拿戒指、谁拿红包、谁控门口节奏先说清。' },
+    { id:'bride_dress', phase:'女方准备', label:'女方主纱与礼服', hint:'主纱、敬酒服、头纱、晨袍和便鞋确认。' },
+    { id:'bride_jewel', phase:'女方准备', label:'女方首饰与手捧', hint:'项链耳饰、手捧花、誓言卡和纸巾。' },
+    { id:'bride_tea', phase:'女方准备', label:'敬茶与改口用品', hint:'茶具、跪垫、改口红包、长辈座位与端茶顺序。' },
+    { id:'scene_ring', phase:'现场流程', label:'戒指 / 誓言 / 托盘', hint:'戒指盒、誓言卡、话筒、托盘和纸巾放到位。' },
+    { id:'scene_route', phase:'现场流程', label:'入场与退场动线', hint:'新人、父母、伴郎伴娘的走位提前演练。' },
+    { id:'scene_music', phase:'现场流程', label:'音乐与灯光节点', hint:'入场、誓言、拥吻、敬酒和送客音乐对齐。' },
+    { id:'scene_table', phase:'现场流程', label:'主桌与礼桌确认', hint:'主桌名单、席位、礼金台和签到台再核一次。' },
+    { id:'staff_host_arrive', phase:'工作人员', label:'主持到场与串词', hint:'主持先过流程、词稿、麦位和应急口播。' },
+    { id:'staff_photo_arrive', phase:'工作人员', label:'摄影机位与跟拍点', hint:'确认接亲位、主机位、合影位和备用电池。' },
+    { id:'staff_video_arrive', phase:'工作人员', label:'摄像收音与机位', hint:'确认收音源、同步、稳定器和机位切换。' },
+    { id:'staff_runner', phase:'工作人员', label:'执行助手分派', hint:'谁盯时间、谁盯物料、谁盯家属沟通。' },
+    { id:'staff_vendor', phase:'工作人员', label:'酒店 / 化妆 / 车队联动', hint:'关键联系人拉到一个群，临场沟通更快。' },
+    { id:'wrap_payment', phase:'收尾复核', label:'尾款与礼品交接', hint:'尾款、发票、礼品和遗留物逐项确认。' },
+    { id:'wrap_feedback', phase:'收尾复核', label:'客户反馈与复盘', hint:'记录当天问题、客户评价和补发事项。' }
+  ];
+  var DEFAULT_REGION_CUSTOMS = {
+    '通用': [
+      { id:'lib_general_order', phase:'地区补充', label:'家族礼序再确认', hint:'先问清双方谁先出场、谁先发言、谁先敬茶。' },
+      { id:'lib_general_words', phase:'地区补充', label:'称呼与口播禁忌', hint:'把长辈称呼、忌讳词和主持口播提前统一。' }
+    ],
+    '江苏': [
+      { id:'lib_js_door', phase:'江苏风俗', label:'接亲节奏细化', hint:'堵门、找鞋、敬茶通常衔接较紧，建议每段都留出缓冲。' },
+      { id:'lib_js_tea', phase:'江苏风俗', label:'敬茶顺序先确认', hint:'先确认双方长辈座次、端茶顺序和改口红包交接。' }
+    ],
+    '华北': [
+      { id:'lib_north_red', phase:'华北风俗', label:'红包与热闹环节', hint:'华北地区常更重视堵门气氛，红包数量和节奏要控住。' },
+      { id:'lib_north_words', phase:'华北风俗', label:'口彩与出门话术', hint:'出门口彩、长辈叮嘱、车队出发口播提前统一。' }
+    ],
+    '华南': [
+      { id:'lib_south_tea', phase:'华南风俗', label:'敬茶礼序', hint:'华南常更重视敬茶与称呼，长辈站位和茶杯顺序不要错。' },
+      { id:'lib_south_gifts', phase:'华南风俗', label:'礼品与回礼', hint:'回礼、礼盒、金饰或礼盘交接要有人专门盯。' }
+    ],
+    '西南': [
+      { id:'lib_sw_mood', phase:'西南风俗', label:'气氛带动', hint:'西南现场更看重气氛，主持与执行口径保持统一。' },
+      { id:'lib_sw_table', phase:'西南风俗', label:'宴席衔接', hint:'敬酒路线、上菜节奏、互动串场尽量提前和酒店对齐。' }
+    ]
+  };
+
+
+  var state = {
+    events: [],
+    checksByEvent: {},
+    customsByEvent: {},
+    templateChecks: {},
+    checkItems: [],
+    regionCustoms: {},
+    settings: { brandName:'婚礼管家' },
+    ui: { activeScreen:'dashboard', activeFilter:'all', editingId:null, step:0, templateCollapsed:true }
+  };
+
+  var els = {};
+
+  function bind(){
+    [
+      'brandNameDisplay','currentTitle','saveChip','saveBtn','menuBtn','menuSheet','closeMenuSheet','eventModalWrap','dataCenterWrap','closeEventModalBtn',
+      'closeDataCenterBtn','doneDataCenterBtn','addEventBtnTop','recentEvents','scheduleList','clientList','clientSearchInput','clientSearchMeta','workspaceHero',
+      'workspaceOps','workspaceTimeline','workspaceAlerts','workspaceClientInfo','workspaceFlowChecklist','workspaceStaffChecklist',
+      'templateChecklist','checklistSummary','checklistClientHero','currentChecklist',
+      'customsPlan','customsNotes','customsChecklist','customsRegionSelect','newRegionName','addRegionBtn','newCustomTitle','newCustomHint','addCustomBtn','customsLibraryList',
+      'eventStepper','deleteEventBtn','saveEventBtn','prevStepBtn',
+      'nextStepBtn','importFile','exportBtn','importBtn','clearDataBtn','dataCenterSummary','dataCenterDetails','storageModeChip',
+      'deviceBadge','resetChecklistBtn','copyChecklistBtn','templateToggleBtn','templateLibraryBody','addChecklistItemBtn','exportCurrentPageBtn','exportClientChecklistBtn','e_client','eventNewClientWrap','e_newClientName'
+    ].forEach(function(id){ els[id] = document.getElementById(id); });
+  }
+
+  function getBrandName(){
+    var name = state.settings && state.settings.brandName ? String(state.settings.brandName) : '婚礼管家';
+    name = name.replace(/\s+/g, ' ').trim();
+    return name || '婚礼管家';
+  }
+
+  function renderBrandName(){
+    if(els.brandNameDisplay && els.brandNameDisplay.textContent !== getBrandName()){
+      els.brandNameDisplay.textContent = getBrandName();
+    }
+    document.title = getBrandName() + ' 移动端独立版 v11';
+  }
+
+  function saveBrandNameFromEditor(){
+    if(!els.brandNameDisplay) return;
+    var text = String(els.brandNameDisplay.textContent || '').replace(/\s+/g, ' ').trim();
+    if(!text) text = '婚礼管家';
+    state.settings = state.settings || {};
+    state.settings.brandName = text;
+    els.brandNameDisplay.textContent = text;
+    saveState(false);
+    showSaved('名字已保存');
+    renderBrandName();
+  }
+
+  function syncTemplateLibraryCollapsed(persist){
+    state.ui.templateCollapsed = !!state.ui.templateCollapsed;
+    if(els.templateLibraryBody) els.templateLibraryBody.hidden = state.ui.templateCollapsed;
+    if(els.templateToggleBtn) els.templateToggleBtn.textContent = state.ui.templateCollapsed ? '展开' : '收起';
+    if(persist !== false) saveState(false);
+  }
+
+  function toggleTemplateLibrary(){
+    state.ui.templateCollapsed = !state.ui.templateCollapsed;
+    syncTemplateLibraryCollapsed();
+  }
+
+
+  function defaultRegionCustoms(){
+    return JSON.parse(JSON.stringify(DEFAULT_REGION_CUSTOMS));
+  }
+
+  function buildRegionCustoms(raw){
+    var base = defaultRegionCustoms();
+    if(raw && typeof raw === 'object'){
+      Object.keys(raw).forEach(function(key){
+        if(!Array.isArray(raw[key])) return;
+        base[key] = raw[key].map(function(item, index){
+          return {
+            id: item && item.id ? String(item.id) : ('lib_' + key + '_' + index),
+            phase: item && item.phase ? String(item.phase) : '地区补充',
+            label: item && (item.label || item.title) ? String(item.label || item.title) : ('风俗内容 ' + (index + 1)),
+            hint: item && (item.hint || item.desc) ? String(item.hint || item.desc) : '请补充执行说明。'
+          };
+        });
+      });
+    }
+    return base;
+  }
+
+  function defaultCheckItems(){
+    return JSON.parse(JSON.stringify(CHECK_TEMPLATE));
+  }
+
+  function buildCheckItems(raw){
+    var source = Array.isArray(raw) && raw.length ? raw : defaultCheckItems();
+    return source.map(function(item, index){
+      var phase = item && item.phase ? String(item.phase) : '现场流程';
+      var label = item && (item.label || item.title) ? String(item.label || item.title) : ('清单项 ' + (index + 1));
+      var hint = item && (item.hint || item.desc) ? String(item.hint || item.desc) : '请补充执行说明。';
+      var baseId = item && item.id ? String(item.id) : ('check_' + index);
+      return { id: baseId, phase: phase, label: label, hint: hint };
+    });
+  }
+
+  function getCheckItems(){
+    if(!Array.isArray(state.checkItems) || !state.checkItems.length){
+      state.checkItems = buildCheckItems();
+    }
+    return state.checkItems;
+  }
+
+  function syncChecklistMaps(){
+    var items = getCheckItems();
+    var template = state.templateChecks && typeof state.templateChecks === 'object' ? state.templateChecks : {};
+    items.forEach(function(item){
+      if(typeof template[item.id] === 'undefined') template[item.id] = false;
+    });
+    state.templateChecks = template;
+    Object.keys(state.checksByEvent || {}).forEach(function(eventId){
+      var current = state.checksByEvent[eventId] && typeof state.checksByEvent[eventId] === 'object' ? state.checksByEvent[eventId] : {};
+      items.forEach(function(item){
+        if(typeof current[item.id] === 'undefined') current[item.id] = false;
+      });
+      state.checksByEvent[eventId] = current;
+    });
+  }
+
+  function insertChecklistItemAtPhase(phase, label, hint){
+    var items = getCheckItems();
+    var newItem = {
+      id: 'check_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6),
+      phase: phase || '现场流程',
+      label: label,
+      hint: hint || '请补充执行说明。'
+    };
+    var insertIndex = items.length;
+    for(var i = items.length - 1; i >= 0; i--){
+      if((items[i].phase || '现场流程') === newItem.phase){
+        insertIndex = i + 1;
+        break;
+      }
+    }
+    items.splice(insertIndex, 0, newItem);
+    state.checkItems = items;
+    syncChecklistMaps();
+    saveState();
+    refreshAll();
+    showSaved('已添加并保存');
+  }
+
+  function updateChecklistItemInline(itemId, label, hint){
+    var item = getCheckItems().find(function(entry){ return entry.id === itemId; });
+    if(!item) return false;
+    item.label = label;
+    item.hint = hint || '请补充执行说明。';
+    state.checkItems = getCheckItems();
+    syncChecklistMaps();
+    saveState();
+    refreshAll();
+    showSaved('已修改并保存');
+    return true;
+  }
+
+  function removeChecklistItem(itemId){
+    var items = getCheckItems();
+    var foundIndex = items.findIndex(function(entry){ return entry.id === itemId; });
+    if(foundIndex < 0) return false;
+    items.splice(foundIndex, 1);
+    state.checkItems = items;
+    if(state.templateChecks && typeof state.templateChecks === 'object') delete state.templateChecks[itemId];
+    Object.keys(state.checksByEvent || {}).forEach(function(eventId){
+      if(state.checksByEvent[eventId] && typeof state.checksByEvent[eventId] === 'object'){
+        delete state.checksByEvent[eventId][itemId];
+      }
+    });
+    saveState();
+    refreshAll();
+    showSaved('已删除并保存');
+    return true;
+  }
+
+  function normalizeTimelineItems(raw){
+    var list = Array.isArray(raw) ? raw : [];
+    return list.map(function(item, index){
+      return {
+        id: item && item.id ? String(item.id) : ('timeline_' + index),
+        time: item && item.time ? String(item.time) : '--:--',
+        title: item && (item.title || item.label) ? String(item.title || item.label) : ('时间节点 ' + (index + 1)),
+        desc: item && (item.desc || item.hint) ? String(item.desc || item.hint) : '请补充执行说明。'
+      };
+    });
+  }
+
+  function buildTimelineItems(evt){
+    if(!evt) return [];
+    var hostArrive = evt.staffHostArrive || suggestTime(evt.ceremony, -60);
+    var photoArrive = evt.staffPhotoArrive || suggestTime(evt.ceremony, -75);
+    var videoArrive = evt.staffVideoArrive || suggestTime(evt.ceremony, -75);
+    var timeline = [
+      { id:'tl_team', time: suggestTime(evt.ceremony, -120), title: '团队集合', desc: '确认所有人位置、对讲方式和设备状态。' },
+      { id:'tl_photo', time: photoArrive, title: '摄影到场', desc: evt.staffPhoto ? '负责人：' + evt.staffPhoto : '建议提前准备机位与跟拍动线。' },
+      { id:'tl_video', time: videoArrive, title: '摄像到场', desc: evt.staffVideo ? '负责人：' + evt.staffVideo : '建议先确认收音、机位、电池。' },
+      { id:'tl_host', time: hostArrive, title: '主持到场', desc: evt.staffHost ? '负责人：' + evt.staffHost : '建议到场后先串词和走位。' }
+    ];
+    if(evt.door) timeline.push({ id:'tl_door', time: suggestTime(evt.ceremony, -35), title: '堵门节点', desc: '红包、游戏、情绪收口与出门节奏一起控制。' });
+    if(evt.tea) timeline.push({ id:'tl_tea', time: suggestTime(evt.ceremony, -15), title: '敬茶 / 改口', desc: '提醒长辈站位、茶具顺序、摄影机位。' });
+    timeline.push({ id:'tl_ceremony', time: evt.ceremony || '09:00', title: '仪式开始', desc: evt.note || '按既定流程推进当天节点。' });
+    timeline.push({ id:'tl_banquet', time: suggestTime(evt.ceremony, 90), title: evt.banquet === '晚宴' ? '晚宴敬酒' : '午宴敬酒', desc: '控制敬酒路线与拍摄节奏，避免压缩后段流程。' });
+    if(evt.returnHome) timeline.push({ id:'tl_return', time: suggestTime(evt.ceremony, 240), title: '回门提醒', desc: '确认是否有回门流程、礼品或二次拍摄安排。' });
+    return timeline;
+  }
+
+  function getTimelineItems(evt){
+    if(!evt) return [];
+    if(!Array.isArray(evt.timelineItems) || !evt.timelineItems.length){
+      evt.timelineItems = buildTimelineItems(evt);
+      saveState(false);
+    }else{
+      evt.timelineItems = normalizeTimelineItems(evt.timelineItems);
+    }
+    return evt.timelineItems;
+  }
+
+  function normalizeStaffInfoItems(raw, evt){
+    var source = Array.isArray(raw) ? raw : [];
+    var fallback = source.length ? source : [
+      { id:'staffinfo_host', task:'主持', name: evt && evt.staffHost ? evt.staffHost : '', phone:'' },
+      { id:'staffinfo_photo', task:'摄影', name: evt && evt.staffPhoto ? evt.staffPhoto : '', phone:'' },
+      { id:'staffinfo_video', task:'摄像', name: evt && evt.staffVideo ? evt.staffVideo : '', phone:'' }
+    ];
+    return fallback.map(function(item, index){
+      return {
+        id: item && item.id ? String(item.id) : ('staffinfo_' + index + '_' + Date.now().toString(36)),
+        task: item && item.task ? String(item.task) : ('任务 ' + (index + 1)),
+        name: item && item.name ? String(item.name) : '',
+        phone: item && item.phone ? String(item.phone) : ''
+      };
+    });
+  }
+
+  function getStaffInfoItems(evt){
+    if(!evt) return [];
+    evt.staffInfoItems = normalizeStaffInfoItems(evt.staffInfoItems, evt);
+    return evt.staffInfoItems;
+  }
+
+  function updateTimelineItemInline(eventId, itemId, time, title, desc){
+    var evt = state.events.find(function(entry){ return entry.id === eventId; });
+    if(!evt) return false;
+    var timeline = getTimelineItems(evt);
+    var item = timeline.find(function(entry){ return entry.id === itemId; });
+    if(!item) return false;
+    item.time = time || '--:--';
+    item.title = title;
+    item.desc = desc || '请补充执行说明。';
+    evt.timelineItems = timeline;
+    saveState();
+    refreshAll();
+    showSaved('已修改并保存');
+    return true;
+  }
+
+  function removeTimelineItemInline(eventId, itemId){
+    var evt = state.events.find(function(entry){ return entry.id === eventId; });
+    if(!evt) return false;
+    var timeline = getTimelineItems(evt);
+    var foundIndex = timeline.findIndex(function(entry){ return entry.id === itemId; });
+    if(foundIndex < 0) return false;
+    timeline.splice(foundIndex, 1);
+    evt.timelineItems = timeline;
+    saveState();
+    refreshAll();
+    showSaved('已删除并保存');
+    return true;
+  }
+
+  function insertTimelineItemAfter(eventId, anchorId, time, title, desc){
+    var evt = state.events.find(function(entry){ return entry.id === eventId; });
+    if(!evt) return false;
+    var timeline = getTimelineItems(evt);
+    var insertIndex = timeline.length;
+    if(anchorId){
+      var foundIndex = timeline.findIndex(function(entry){ return entry.id === anchorId; });
+      if(foundIndex >= 0) insertIndex = foundIndex + 1;
+    }
+    timeline.splice(insertIndex, 0, {
+      id: 'tl_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6),
+      time: time || '--:--',
+      title: title,
+      desc: desc || '请补充执行说明。'
+    });
+    evt.timelineItems = timeline;
+    saveState();
+    refreshAll();
+    showSaved('已添加并保存');
+    return true;
+  }
+
+  function removeTimelineInlineEditors(scope){
+    if(!scope) return;
+    scope.querySelectorAll('.timelineInlineEditor').forEach(function(node){ node.remove(); });
+  }
+
+  function openTimelineInlineEditor(scope, config){
+    if(!scope || !config) return;
+    removeTimelineInlineEditors(scope);
+    var editor = document.createElement('div');
+    editor.className = 'timelineInlineEditor';
+    if(config.itemId) editor.setAttribute('data-timeline-edit-id', config.itemId);
+    if(config.anchorId) editor.setAttribute('data-timeline-anchor-id', config.anchorId);
+    editor.setAttribute('data-timeline-event-id', config.eventId || '');
+    editor.innerHTML = '<div class="inlineField"><label>时间</label><input data-timeline-time placeholder="例如 08:30" value="' + escapeHtml(config.time || '') + '" /></div><div class="inlineField"><label>' + (config.itemId ? '流程标题' : '新增流程标题') + '</label><input data-timeline-title placeholder="例如 新人集合确认" value="' + escapeHtml(config.title || '') + '" /></div><div class="inlineField"><label>执行说明</label><textarea data-timeline-desc placeholder="例如 由主持、摄影、摄像一起碰头。">' + escapeHtml(config.desc || '') + '</textarea></div><div class="inlineActions"><button class="ghostBtn smallBtn" type="button" data-timeline-cancel="1">取消</button><button class="inlineActionBtn" type="button" data-timeline-save="1">' + (config.itemId ? '保存修改' : '直接添加') + '</button></div>';
+    if(config.anchor && config.anchor.parentNode){
+      config.anchor.insertAdjacentElement('afterend', editor);
+      var input = editor.querySelector('[data-timeline-time]');
+      if(input) input.focus();
+    }else{
+      scope.appendChild(editor);
+    }
+  }
+
+  function bindTimelineManage(scope, evt){
+    if(!scope || !evt) return;
+    scope.dataset.timelineEventId = evt.id;
+    if(scope.dataset.timelineManageBound === '1') return;
+    scope.dataset.timelineManageBound = '1';
+    scope.addEventListener('click', function(event){
+      var currentEventId = scope.dataset.timelineEventId || '';
+      var currentEvent = state.events.find(function(entry){ return entry.id === currentEventId; });
+      if(!currentEvent) return;
+
+      var rootAddBtn = event.target.closest('[data-timeline-add-root]');
+      if(rootAddBtn && scope.contains(rootAddBtn)){
+        event.preventDefault();
+        openTimelineInlineEditor(scope, { eventId: currentEvent.id, time: suggestTime(currentEvent.ceremony, -10) });
+        return;
+      }
+
+      var removeBtn = event.target.closest('[data-timeline-remove]');
+      if(removeBtn && scope.contains(removeBtn)){
+        event.preventDefault();
+        var removeId = removeBtn.getAttribute('data-timeline-remove');
+        if(removeId && confirm('确认删除这个时间流程吗？')) removeTimelineItemInline(currentEvent.id, removeId);
+        return;
+      }
+
+      var editBtn = event.target.closest('[data-timeline-edit]');
+      if(editBtn && scope.contains(editBtn)){
+        event.preventDefault();
+        var itemId = editBtn.getAttribute('data-timeline-edit');
+        var item = getTimelineItems(currentEvent).find(function(entry){ return entry.id === itemId; });
+        var row = editBtn.closest('[data-timeline-row]');
+        if(item && row){
+          openTimelineInlineEditor(scope, { eventId: currentEvent.id, itemId: item.id, anchor: row, time: item.time || '', title: item.title || '', desc: item.desc || '' });
+        }
+        return;
+      }
+
+      var cancelBtn = event.target.closest('[data-timeline-cancel]');
+      if(cancelBtn && scope.contains(cancelBtn)){
+        event.preventDefault();
+        var box = cancelBtn.closest('.timelineInlineEditor');
+        if(box) box.remove();
+        return;
+      }
+
+      var saveBtn = event.target.closest('[data-timeline-save]');
+      if(saveBtn && scope.contains(saveBtn)){
+        event.preventDefault();
+        var editor = saveBtn.closest('.timelineInlineEditor');
+        if(!editor) return;
+        var timeInput = editor.querySelector('[data-timeline-time]');
+        var titleInput = editor.querySelector('[data-timeline-title]');
+        var descInput = editor.querySelector('[data-timeline-desc]');
+        var time = timeInput ? String(timeInput.value || '').trim() : '';
+        var title = titleInput ? String(titleInput.value || '').trim() : '';
+        var desc = descInput ? String(descInput.value || '').trim() : '';
+        if(!title){
+          alert('流程标题不能为空。');
+          if(titleInput) titleInput.focus();
+          return;
+        }
+        var editId = editor.getAttribute('data-timeline-edit-id');
+        if(editId){
+          updateTimelineItemInline(currentEvent.id, editId, time, title, desc);
+        }else{
+          insertTimelineItemAfter(currentEvent.id, editor.getAttribute('data-timeline-anchor-id') || '', time, title, desc);
+        }
+      }
+    });
+  }
+
+  function removeStaffInfoInlineEditors(scope){
+    if(!scope) return;
+    scope.querySelectorAll('.staffInlineEditor').forEach(function(node){ node.remove(); });
+  }
+
+  function openStaffInfoInlineEditor(scope, config){
+    if(!scope || !config) return;
+    removeStaffInfoInlineEditors(scope);
+    var editor = document.createElement('div');
+    editor.className = 'checkInlineEditor staffInlineEditor';
+    if(config.itemId) editor.setAttribute('data-staff-edit-id', config.itemId);
+    if(config.anchorId) editor.setAttribute('data-staff-anchor-id', config.anchorId);
+    editor.setAttribute('data-staff-event-id', config.eventId || '');
+    editor.innerHTML = '<div class="inlineField"><label>任务</label><input data-staff-task placeholder="例如 主持 / 执行助手 / 车队" value="' + escapeHtml(config.task || '') + '" /></div><div class="inlineField"><label>姓名</label><input data-staff-name placeholder="例如 张老师" value="' + escapeHtml(config.name || '') + '" /></div><div class="inlineField"><label>电话</label><input data-staff-phone placeholder="例如 13800000000" value="' + escapeHtml(config.phone || '') + '" /></div><div class="inlineActions"><button class="ghostBtn smallBtn" type="button" data-staff-cancel="1">取消</button><button class="inlineActionBtn" type="button" data-staff-save="1">' + (config.itemId ? '保存修改' : '直接添加') + '</button></div>';
+    if(config.anchor && config.anchor.parentNode){
+      config.anchor.insertAdjacentElement('afterend', editor);
+    }else if(scope.lastElementChild){
+      scope.lastElementChild.insertAdjacentElement('afterend', editor);
+    }else{
+      scope.appendChild(editor);
+    }
+    var input = editor.querySelector('[data-staff-task]');
+    if(input) input.focus();
+  }
+
+  function updateStaffInfoItemInline(eventId, itemId, task, name, phone){
+    var evt = state.events.find(function(entry){ return entry.id === eventId; });
+    if(!evt) return false;
+    var items = getStaffInfoItems(evt);
+    var item = items.find(function(entry){ return entry.id === itemId; });
+    if(!item) return false;
+    item.task = task;
+    item.name = name || '';
+    item.phone = phone || '';
+    evt.staffInfoItems = items;
+    saveState();
+    refreshAll();
+    showSaved('已修改并保存');
+    return true;
+  }
+
+  function insertStaffInfoItemAfter(eventId, anchorId, task, name, phone){
+    var evt = state.events.find(function(entry){ return entry.id === eventId; });
+    if(!evt) return false;
+    var items = getStaffInfoItems(evt);
+    var insertIndex = items.length;
+    if(anchorId){
+      var foundIndex = items.findIndex(function(entry){ return entry.id === anchorId; });
+      if(foundIndex >= 0) insertIndex = foundIndex + 1;
+    }
+    items.splice(insertIndex, 0, {
+      id: 'staffinfo_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6),
+      task: task,
+      name: name || '',
+      phone: phone || ''
+    });
+    evt.staffInfoItems = items;
+    saveState();
+    refreshAll();
+    showSaved('已添加并保存');
+    return true;
+  }
+
+  function bindStaffInfoManage(scope, evt){
+    if(!scope || !evt) return;
+    scope.dataset.staffEventId = evt.id;
+    if(scope.dataset.staffManageBound === '1') return;
+    scope.dataset.staffManageBound = '1';
+    scope.addEventListener('click', function(event){
+      var currentEventId = scope.dataset.staffEventId || '';
+      var currentEvent = state.events.find(function(entry){ return entry.id === currentEventId; });
+      if(!currentEvent) return;
+
+      var rootAddBtn = event.target.closest('[data-staff-add-root]');
+      if(rootAddBtn && scope.contains(rootAddBtn)){
+        event.preventDefault();
+        openStaffInfoInlineEditor(scope, { eventId: currentEvent.id });
+        return;
+      }
+
+      var addBtn = event.target.closest('[data-staff-add-after]');
+      if(addBtn && scope.contains(addBtn)){
+        event.preventDefault();
+        var row = addBtn.closest('[data-staff-row]');
+        openStaffInfoInlineEditor(scope, { eventId: currentEvent.id, anchorId: addBtn.getAttribute('data-staff-add-after') || '', anchor: row });
+        return;
+      }
+
+      var editBtn = event.target.closest('[data-staff-edit]');
+      if(editBtn && scope.contains(editBtn)){
+        event.preventDefault();
+        var itemId = editBtn.getAttribute('data-staff-edit');
+        var item = getStaffInfoItems(currentEvent).find(function(entry){ return entry.id === itemId; });
+        var row = editBtn.closest('[data-staff-row]');
+        if(item && row){
+          openStaffInfoInlineEditor(scope, { eventId: currentEvent.id, itemId: item.id, anchor: row, task: item.task || '', name: item.name || '', phone: item.phone || '' });
+        }
+        return;
+      }
+
+      var cancelBtn = event.target.closest('[data-staff-cancel]');
+      if(cancelBtn && scope.contains(cancelBtn)){
+        event.preventDefault();
+        var cancelBox = cancelBtn.closest('.staffInlineEditor');
+        if(cancelBox) cancelBox.remove();
+        return;
+      }
+
+      var saveBtn = event.target.closest('[data-staff-save]');
+      if(saveBtn && scope.contains(saveBtn)){
+        event.preventDefault();
+        var editor = saveBtn.closest('.staffInlineEditor');
+        if(!editor) return;
+        var taskInput = editor.querySelector('[data-staff-task]');
+        var nameInput = editor.querySelector('[data-staff-name]');
+        var phoneInput = editor.querySelector('[data-staff-phone]');
+        var task = taskInput ? String(taskInput.value || '').trim() : '';
+        var name = nameInput ? String(nameInput.value || '').trim() : '';
+        var phone = phoneInput ? String(phoneInput.value || '').trim() : '';
+        if(!task){
+          alert('请先填写任务。');
+          if(taskInput) taskInput.focus();
+          return;
+        }
+        var editId = editor.getAttribute('data-staff-edit-id');
+        if(editId){
+          updateStaffInfoItemInline(currentEvent.id, editId, task, name, phone);
+        }else{
+          insertStaffInfoItemAfter(currentEvent.id, editor.getAttribute('data-staff-anchor-id') || '', task, name, phone);
+        }
+      }
+    });
+  }
+
+  function removeChecklistInlineEditors(scope){
+    if(!scope) return;
+    scope.querySelectorAll('.checkInlineEditor').forEach(function(node){ node.remove(); });
+  }
+
+  function openChecklistInlineEditor(scope, config){
+    if(!scope || !config) return;
+    removeChecklistInlineEditors(scope);
+    var editor = document.createElement('div');
+    editor.className = 'checkInlineEditor';
+    editor.setAttribute('data-inline-editor', 'true');
+    editor.setAttribute('data-phase-key', config.phase || '');
+    if(config.itemId) editor.setAttribute('data-edit-id', config.itemId);
+    var labelValue = config.label || '';
+    var hintValue = config.hint || '';
+    var phaseText = config.phase || '现场流程';
+    editor.innerHTML = '<div class="inlineField"><label>当前类目</label><input value="' + escapeHtml(phaseText) + '" readonly /></div><div class="inlineField"><label>' + (config.itemId ? '清单标题' : '新增清单标题') + '</label><input data-inline-label placeholder="例如：确认胸花与手捧花" value="' + escapeHtml(labelValue) + '" /></div><div class="inlineField"><label>执行说明 / 备注</label><textarea data-inline-hint placeholder="例如：由执行助手在出门前 10 分钟复核。">' + escapeHtml(hintValue) + '</textarea></div><div class="inlineActions"><button class="ghostBtn smallBtn" type="button" data-inline-cancel="1">取消</button><button class="inlineActionBtn" type="button" data-inline-save="1">' + (config.itemId ? '保存修改' : '直接添加') + '</button></div>';
+    if(config.anchor && config.anchor.parentNode){
+      config.anchor.insertAdjacentElement('afterend', editor);
+      var input = editor.querySelector('[data-inline-label]');
+      if(input) input.focus();
+    }
+  }
+
+  function bindChecklistEditButtons(scope){
+    if(!scope || scope.dataset.checklistManageBound === '1') return;
+    scope.dataset.checklistManageBound = '1';
+    scope.addEventListener('click', function(event){
+      var addBtn = event.target.closest('[data-inline-add]');
+      if(addBtn && scope.contains(addBtn)){
+        event.preventDefault();
+        var phase = addBtn.getAttribute('data-inline-add') || '现场流程';
+        var rows = Array.prototype.slice.call(scope.querySelectorAll('[data-check-row][data-phase-key="' + cssEscapeAttr(phase) + '"]'));
+        var anchor = rows.length ? rows[rows.length - 1] : addBtn.closest('[data-group-head]');
+        openChecklistInlineEditor(scope, { phase: phase, anchor: anchor });
+        return;
+      }
+
+      var removeBtn = event.target.closest('[data-item-remove]');
+      if(removeBtn && scope.contains(removeBtn)){
+        event.preventDefault();
+        var removeId = removeBtn.getAttribute('data-item-remove');
+        if(removeId && confirm('确认删除这个清单项吗？')) removeChecklistItem(removeId);
+        return;
+      }
+
+      var editBtn = event.target.closest('[data-item-edit]');
+      if(editBtn && scope.contains(editBtn)){
+        event.preventDefault();
+        var itemId = editBtn.getAttribute('data-item-edit');
+        var item = getCheckItems().find(function(entry){ return entry.id === itemId; });
+        var row = editBtn.closest('[data-check-row]');
+        if(item && row){
+          openChecklistInlineEditor(scope, { itemId: item.id, phase: item.phase || '现场流程', label: item.label || '', hint: item.hint || '', anchor: row });
+        }
+        return;
+      }
+
+      var cancelBtn = event.target.closest('[data-inline-cancel]');
+      if(cancelBtn && scope.contains(cancelBtn)){
+        event.preventDefault();
+        var inlineBox = cancelBtn.closest('.checkInlineEditor');
+        if(inlineBox) inlineBox.remove();
+        return;
+      }
+
+      var saveBtn = event.target.closest('[data-inline-save]');
+      if(saveBtn && scope.contains(saveBtn)){
+        event.preventDefault();
+        var editor = saveBtn.closest('.checkInlineEditor');
+        if(!editor) return;
+        var labelInput = editor.querySelector('[data-inline-label]');
+        var hintInput = editor.querySelector('[data-inline-hint]');
+        var label = labelInput ? String(labelInput.value || '').trim() : '';
+        var hint = hintInput ? String(hintInput.value || '').trim() : '';
+        if(!label){
+          alert('清单标题不能为空。');
+          if(labelInput) labelInput.focus();
+          return;
+        }
+        var editId = editor.getAttribute('data-edit-id');
+        var phase = editor.getAttribute('data-phase-key') || '现场流程';
+        if(editId){
+          updateChecklistItemInline(editId, label, hint);
+        }else{
+          insertChecklistItemAtPhase(phase, label, hint);
+        }
+      }
+    });
+  }
+
+  function promptChecklistItemEditor(itemId){
+    var targetScope = els.currentChecklist || els.templateChecklist;
+    if(!targetScope){
+      return;
+    }
+    if(itemId){
+      var item = getCheckItems().find(function(entry){ return entry.id === itemId; });
+      if(!item) return;
+      var row = targetScope.querySelector('[data-check-row][data-item-id="' + cssEscapeAttr(itemId) + '"]');
+      openChecklistInlineEditor(targetScope, { itemId: item.id, phase: item.phase || '现场流程', label: item.label || '', hint: item.hint || '', anchor: row || targetScope.firstElementChild || targetScope });
+      return;
+    }
+    var phase = '现场流程';
+    var head = targetScope.querySelector('[data-group-head]');
+    if(head && head.getAttribute('data-phase-key')) phase = head.getAttribute('data-phase-key');
+    openChecklistInlineEditor(targetScope, { phase: phase, anchor: head || targetScope.firstElementChild || targetScope });
+  }
+
+  function resolveRegionKey(region){
+    var text = String(region || '').trim();
+    if(!text) return '通用';
+    if(state.regionCustoms[text]) return text;
+    if(/连云港|赣榆|江苏|苏州|南京|无锡/.test(text) && state.regionCustoms['江苏']) return '江苏';
+    if(/河南|山东|河北|山西|北京|天津/.test(text) && state.regionCustoms['华北']) return '华北';
+    if(/广东|福建|潮汕|汕头|厦门|深圳|广州/.test(text) && state.regionCustoms['华南']) return '华南';
+    if(/四川|重庆|湖南|湖北|贵州|云南/.test(text) && state.regionCustoms['西南']) return '西南';
+    return '通用';
+  }
+
+  function getRegionLibraryItems(regionKey){
+    var key = resolveRegionKey(regionKey);
+    return Array.isArray(state.regionCustoms[key]) ? state.regionCustoms[key] : [];
+  }
+
+  function renderRegionLibraryPanel(preferredRegion, evt){
+    if(!els.customsRegionSelect || !els.customsLibraryList) return;
+    var keys = Object.keys(state.regionCustoms || {});
+    if(!keys.length){
+      state.regionCustoms = buildRegionCustoms();
+      keys = Object.keys(state.regionCustoms);
+    }
+    keys.sort(function(a,b){
+      if(a === '通用') return -1;
+      if(b === '通用') return 1;
+      return a.localeCompare(b, 'zh-Hans-CN');
+    });
+    var regionKey = preferredRegion && state.regionCustoms[preferredRegion] ? preferredRegion : resolveRegionKey(preferredRegion);
+    if(keys.indexOf(regionKey) < 0) regionKey = keys[0];
+    els.customsRegionSelect.innerHTML = keys.map(function(key){
+      return '<option value="' + escapeHtml(key) + '">' + escapeHtml(key) + '</option>';
+    }).join('');
+    els.customsRegionSelect.value = regionKey;
+
+    var list = getRegionLibraryItems(regionKey);
+    var notes = [];
+    if(evt){
+      notes.push('<div class="notice">当前档期地区：' + escapeHtml(evt.region || '未填写') + '，当前引用风俗库：' + escapeHtml(regionKey) + '。</div>');
+    }else{
+      notes.push('<div class="notice">当前管理风俗库：' + escapeHtml(regionKey) + '。没有档期时也能先维护地区内容。</div>');
+    }
+    notes.push('<div class="notice" style="margin-top:10px">当前地区共 ' + list.length + ' 条库内风俗内容。你可以先添加地区，再继续追加具体执行提醒。</div>');
+    els.customsNotes.innerHTML = notes.join('');
+
+    if(!list.length){
+      els.customsLibraryList.innerHTML = '<div class="emptyState">这个地区还没有自定义风俗内容，先在上面新增一条。</div>';
+    }else{
+      els.customsLibraryList.innerHTML = '<div class="list">' + list.map(function(item){
+        return '<div class="listItem"><div class="listHead"><div class="listMain"><div class="name">' + escapeHtml(item.label || item.title) + '</div><div class="meta">' + escapeHtml(item.phase || '地区补充') + '</div></div><span class="badge blue">库内容</span></div><div class="meta">' + escapeHtml(item.hint || item.desc || '') + '</div></div>';
+      }).join('') + '</div>';
+    }
+  }
+
+  function addRegionLibrary(){
+    var name = (els.newRegionName && els.newRegionName.value ? els.newRegionName.value : '').trim();
+    if(!name){ alert('请先填写地区名称。'); return; }
+    if(!state.regionCustoms[name]) state.regionCustoms[name] = [];
+    if(els.newRegionName) els.newRegionName.value = '';
+    saveState();
+    renderCustoms();
+    alert('已添加地区：' + name);
+  }
+
+  function addCustomToRegion(){
+    if(!els.customsRegionSelect) return;
+    var regionKey = els.customsRegionSelect.value || '通用';
+    var title = (els.newCustomTitle && els.newCustomTitle.value ? els.newCustomTitle.value : '').trim();
+    var hint = (els.newCustomHint && els.newCustomHint.value ? els.newCustomHint.value : '').trim();
+    if(!title){ alert('请先填写风俗内容标题。'); return; }
+    if(!state.regionCustoms[regionKey]) state.regionCustoms[regionKey] = [];
+    state.regionCustoms[regionKey].push({
+      id: 'lib_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6),
+      phase: regionKey + '风俗',
+      label: title,
+      hint: hint || '请补充这个风俗的执行说明。'
+    });
+    if(els.newCustomTitle) els.newCustomTitle.value = '';
+    if(els.newCustomHint) els.newCustomHint.value = '';
+    saveState();
+    renderCustoms();
+    alert('已添加到“' + regionKey + '”风俗库。');
+  }
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){
+        state.checkItems = buildCheckItems();
+        state.templateChecks = defaultTemplateCheckState();
+        state.regionCustoms = buildRegionCustoms();
+        syncChecklistMaps();
+        return;
+      }
+      var parsed = JSON.parse(raw);
+      state.events = Array.isArray(parsed.events) ? parsed.events : [];
+      state.checksByEvent = parsed.checksByEvent && typeof parsed.checksByEvent === 'object' ? parsed.checksByEvent : {};
+      state.customsByEvent = parsed.customsByEvent && typeof parsed.customsByEvent === 'object' ? parsed.customsByEvent : {};
+      state.checkItems = buildCheckItems(parsed.checkItems);
+      state.templateChecks = parsed.templateChecks && typeof parsed.templateChecks === 'object' ? parsed.templateChecks : defaultTemplateCheckState();
+      state.regionCustoms = buildRegionCustoms(parsed.regionCustoms);
+      state.settings = parsed.settings && typeof parsed.settings === 'object' ? parsed.settings : { brandName:'婚礼管家' };
+      state.ui.templateCollapsed = parsed.ui && typeof parsed.ui === 'object' && typeof parsed.ui.templateCollapsed === 'boolean' ? parsed.ui.templateCollapsed : true;
+      if(!Object.keys(state.templateChecks).length){
+        state.templateChecks = defaultTemplateCheckState();
+      }
+      syncChecklistMaps();
+    }catch(err){
+      state.events = [];
+      state.checksByEvent = {};
+      state.customsByEvent = {};
+      state.checkItems = buildCheckItems();
+      state.templateChecks = defaultTemplateCheckState();
+      state.regionCustoms = buildRegionCustoms();
+      state.settings = { brandName:'婚礼管家' };
+      state.ui.templateCollapsed = true;
+      syncChecklistMaps();
+    }
+  }
+
+  function saveState(markSaved){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        events: state.events,
+        checksByEvent: state.checksByEvent,
+        customsByEvent: state.customsByEvent,
+        templateChecks: state.templateChecks,
+        checkItems: state.checkItems,
+        regionCustoms: state.regionCustoms,
+        settings: state.settings,
+        ui: { templateCollapsed: !!state.ui.templateCollapsed }
+      }));
+      if(markSaved !== false){ showSaved('已保存'); }
+      return true;
+    }catch(err){
+      alert('保存失败，可能是浏览器存储被禁用。');
+      return false;
+    }
+  }
+
+  function showSaved(text){
+    els.saveChip.textContent = text || '已保存';
+    clearTimeout(showSaved._timer);
+    showSaved._timer = setTimeout(function(){ els.saveChip.textContent = '已保存'; }, 1800);
+  }
+
+  function markDirty(){
+    els.saveChip.textContent = '未保存';
+  }
+
+  function defaultTemplateCheckState(){
+    var out = {};
+    getCheckItems().forEach(function(item){ out[item.id] = false; });
+    return out;
+  }
+
+  function getDeviceMode(){
+    var w = window.innerWidth;
+    document.body.classList.toggle('foldWide', w >= 980);
+    if(w >= 980) return '展开折叠 / 宽屏';
+    if(w >= 768) return '平板';
+    if(w <= 380) return '翻盖外屏 / 小屏';
+    return '手机';
+  }
+
+  function formatDate(dateStr){
+    if(!dateStr) return '未设置日期';
+    var d = new Date(dateStr + 'T00:00:00');
+    if(isNaN(d.getTime())) return dateStr;
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+
+  function formatDateCN(dateStr){
+    if(!dateStr) return '未设置日期';
+    var d = new Date(dateStr + 'T00:00:00');
+    if(isNaN(d.getTime())) return dateStr;
+    var week = ['日','一','二','三','四','五','六'][d.getDay()];
+    return pad(d.getMonth()+1) + '月' + pad(d.getDate()) + '日 周' + week;
+  }
+
+  function pad(num){ return String(num).padStart(2,'0'); }
+
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+
+  function sortEvents(list){
+    return list.slice().sort(function(a,b){
+      var ak = (a.date || '') + ' ' + (a.ceremony || '23:59');
+      var bk = (b.date || '') + ' ' + (b.ceremony || '23:59');
+      if(ak < bk) return -1;
+      if(ak > bk) return 1;
+      return (b.updatedAt || 0) - (a.updatedAt || 0);
+    });
+  }
+
+  function getNextEvent(){
+    if(!state.events.length) return null;
+    var sorted = sortEvents(state.events);
+    var now = new Date();
+    for(var i=0;i<sorted.length;i++){
+      var evt = sorted[i];
+      var dt = buildDateTime(evt);
+      if(!dt || dt >= now) return evt;
+    }
+    return sorted[sorted.length - 1];
+  }
+
+  function buildDateTime(evt){
+    if(!evt || !evt.date) return null;
+    var raw = evt.date + 'T' + (evt.ceremony || '09:00') + ':00';
+    var dt = new Date(raw);
+    return isNaN(dt.getTime()) ? null : dt;
+  }
+
+  function openSheet(){
+    els.menuSheet.setAttribute('aria-hidden','false');
+    document.body.classList.add('sheet-open');
+  }
+
+  function closeSheet(){
+    els.menuSheet.setAttribute('aria-hidden','true');
+    document.body.classList.remove('sheet-open');
+  }
+
+  function openModal(name){
+    if(name === 'event'){
+      els.eventModalWrap.setAttribute('aria-hidden','false');
+    }
+    if(name === 'data'){
+      refreshDataCenter();
+      els.dataCenterWrap.setAttribute('aria-hidden','false');
+    }
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModal(name){
+    if(name === 'event') els.eventModalWrap.setAttribute('aria-hidden','true');
+    if(name === 'data') els.dataCenterWrap.setAttribute('aria-hidden','true');
+    var anyOpen = els.eventModalWrap.getAttribute('aria-hidden') === 'false' || els.dataCenterWrap.getAttribute('aria-hidden') === 'false';
+    if(!anyOpen) document.body.classList.remove('modal-open');
+  }
+
+  function switchScreen(name){
+    state.ui.activeScreen = name;
+    document.querySelectorAll('.screen').forEach(function(el){
+      el.classList.toggle('active', el.id === 'screen-' + name);
+    });
+    document.querySelectorAll('.navBtn').forEach(function(btn){
+      btn.classList.toggle('active', btn.getAttribute('data-screen') === name);
+    });
+    var titleMap = { dashboard:'首页', workspace:'中枢', customs:'风俗', schedule:'档期', clients:'客户', checklist:'清单' };
+    els.currentTitle.textContent = titleMap[name] || '婚礼管家';
+  }
+
+  function setStep(nextStep){
+    var max = 3;
+    if(nextStep < 0) nextStep = 0;
+    if(nextStep > max) nextStep = max;
+    state.ui.step = nextStep;
+    document.querySelectorAll('.stepPane').forEach(function(pane){
+      pane.classList.toggle('active', Number(pane.getAttribute('data-step')) === nextStep);
+    });
+    document.querySelectorAll('.stepDot').forEach(function(dot){
+      dot.classList.toggle('active', Number(dot.getAttribute('data-index')) === nextStep);
+    });
+  }
+
+  function renderStepper(){
+    var labels = ['基础信息','新人信息','客户信息','团队安排'];
+    els.eventStepper.innerHTML = labels.map(function(label, index){
+      var active = index === state.ui.step ? ' active' : '';
+      return '<button class="stepDot' + active + '" type="button" data-index="' + index + '">' + (index + 1) + ' · ' + label + '</button>';
+    }).join('');
+    els.eventStepper.querySelectorAll('.stepDot').forEach(function(btn){
+      btn.addEventListener('click', function(){ setStep(Number(btn.getAttribute('data-index'))); });
+    });
+  }
+
+  function uniqueClients(){
+    var map = {};
+    state.events.forEach(function(evt){
+      var name = getClientName(evt);
+      if(!name) return;
+      if(!map[name]) map[name] = { name:name, phone:evt.groomPhone || evt.bridePhone || '', region:evt.region || '', count:0, dates:[], keywords:[] };
+      map[name].count += 1;
+      if(!map[name].phone && (evt.groomPhone || evt.bridePhone)) map[name].phone = evt.groomPhone || evt.bridePhone;
+      if(!map[name].region && evt.region) map[name].region = evt.region;
+      if(evt.date && map[name].dates.indexOf(evt.date) < 0) map[name].dates.push(evt.date);
+      [evt.groomName, evt.brideName, evt.groomPhone, evt.bridePhone, evt.date].forEach(function(val){
+        if(!val) return;
+        var token = String(val);
+        if(map[name].keywords.indexOf(token) < 0) map[name].keywords.push(token);
+      });
+    });
+    return Object.keys(map).sort().map(function(key){
+      var client = map[key];
+      client.dates.sort();
+      client.nextDate = client.dates[0] || '';
+      return client;
+    });
+  }
+
+  function formatClientDates(client){
+    var dates = client && Array.isArray(client.dates) ? client.dates.slice() : [];
+    if(!dates.length) return '未设置婚期';
+    if(dates.length <= 3) return dates.map(function(date){ return formatDate(date); }).join(' / ');
+    return dates.slice(0,3).map(function(date){ return formatDate(date); }).join(' / ') + ' 等 ' + dates.length + ' 场';
+  }
+
+  function matchesClientQuery(client, query){
+    if(!query) return true;
+    var q = String(query || '').trim().toLowerCase();
+    if(!q) return true;
+    var fields = [client.name, client.phone, client.region, formatClientDates(client), client.nextDate].concat(client.keywords || []);
+    return fields.some(function(field){
+      return String(field || '').toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  function updateClientSelect(preferred){
+    var clients = uniqueClients();
+    var options = ['<option value="">未关联客户</option>'];
+    clients.forEach(function(item){ options.push('<option value="' + escapeHtml(item.name) + '">' + escapeHtml(item.name) + '</option>'); });
+    options.push('<option value="__new__">+ 新建客户</option>');
+    els.e_client.innerHTML = options.join('');
+    if(preferred){ els.e_client.value = preferred; }
+    if(!els.e_client.value) els.e_client.value = '';
+    toggleNewClientWrap();
+  }
+
+  function toggleNewClientWrap(){
+    var isNew = els.e_client.value === '__new__';
+    els.eventNewClientWrap.classList.toggle('hidden', !isNew);
+    if(!isNew) els.e_newClientName.value = els.e_newClientName.value || '';
+  }
+
+  function getClientName(evt){
+    if(!evt) return '';
+    if(evt.clientName) return evt.clientName;
+    var names = [evt.groomName, evt.brideName].filter(Boolean);
+    return names.join(' & ');
+  }
+
+  function renderStats(){
+    var total = state.events.length;
+    var upcoming = state.events.filter(function(evt){ return evt.status !== '已完成'; }).length;
+    var done = state.events.filter(function(evt){ return evt.status === '已完成'; }).length;
+    var clientCount = uniqueClients().length;
+    var html = [
+      statHtml('总档期', total),
+      statHtml('待执行', upcoming),
+      statHtml('已完成', done),
+      statHtml('客户数', clientCount)
+    ].join('');
+    document.getElementById('statsGrid').innerHTML = html;
+    els.deviceBadge.textContent = getDeviceMode();
+  }
+
+  function statHtml(label, value){
+    return '<div class="statItem"><div class="label">' + label + '</div><div class="value">' + value + '</div></div>';
+  }
+
+  function renderRecentEvents(){
+    var sorted = sortEvents(state.events).slice(0,3);
+    if(!sorted.length){
+      els.recentEvents.innerHTML = '<div class="emptyState" style="margin-top:14px">还没有档期。先点“新增档期”，就能看到真正的移动端录入效果。</div>';
+      return;
+    }
+    els.recentEvents.innerHTML = '<div class="list">' + sorted.map(function(evt){ return eventCardHtml(evt, true); }).join('') + '</div>';
+    bindEventCardActions(els.recentEvents);
+  }
+
+  function renderSchedule(){
+    var list = sortEvents(state.events);
+    var filter = state.ui.activeFilter;
+    if(filter === 'upcoming') list = list.filter(function(evt){ return evt.status !== '已完成'; });
+    if(filter === 'done') list = list.filter(function(evt){ return evt.status === '已完成'; });
+    if(!list.length){
+      els.scheduleList.innerHTML = '<div class="emptyState" style="margin-top:14px">当前筛选下没有数据。</div>';
+      return;
+    }
+
+    var groups = {};
+    list.forEach(function(evt){
+      var key = evt.date ? String(evt.date).slice(0,7) : '未设置月份';
+      if(!groups[key]) groups[key] = [];
+      groups[key].push(evt);
+    });
+
+    var keys = Object.keys(groups).sort();
+    els.scheduleList.innerHTML = keys.map(function(key){
+      var events = groups[key];
+      var clientNames = [];
+      events.forEach(function(evt){
+        var name = getClientName(evt) || '未关联';
+        if(clientNames.indexOf(name) < 0) clientNames.push(name);
+      });
+      var monthTitle = key === '未设置月份' ? key : (key.replace('-', '年') + '月');
+      var monthMeta = '本月档期 ' + events.length + ' 场 · 客户：' + clientNames.join('、');
+      return '<div class="monthBlock"><div class="monthHead"><div><div class="title">' + escapeHtml(monthTitle) + '</div><div class="meta">' + escapeHtml(monthMeta) + '</div></div><span class="badge blue">' + escapeHtml(String(events.length)) + ' 场</span></div><div class="list">' + events.map(function(evt){ return eventCardHtml(evt, false); }).join('') + '</div></div>';
+    }).join('');
+    bindEventCardActions(els.scheduleList);
+  }
+
+  function eventCardHtml(evt, compact){
+    var statusClass = evt.status === '已完成' ? ' green' : (evt.status === '执行中' ? ' blue' : ' orange');
+    var meta = [formatDateCN(evt.date), evt.ceremony || '未设时间', evt.venue || '未设场地'].join(' · ');
+    var couple = [evt.groomName || '新郎未填', evt.brideName || '新娘未填'].join(' / ');
+    var extra = compact ? '' : '<div class="listMeta"><span class="badge">' + escapeHtml(evt.banquet || '午宴') + '</span><span class="badge">' + escapeHtml(evt.region || '未设地区') + '</span><span class="badge">¥ ' + escapeHtml(evt.fee || '0') + '</span></div>';
+    return '<button class="listItem" type="button" data-edit-id="' + evt.id + '">' +
+      '<div class="listHead"><div class="listMain"><div class="name">' + escapeHtml(couple) + '</div><div class="meta">' + escapeHtml(meta) + '</div></div><span class="badge' + statusClass + '">' + escapeHtml(evt.status || '待跟进') + '</span></div>' +
+      extra +
+      '<div class="meta">客户：' + escapeHtml(getClientName(evt) || '未关联') + (evt.note ? ' · 备注：' + escapeHtml(evt.note) : '') + '</div>' +
+    '</button>';
+  }
+
+  function bindEventCardActions(scope){
+    scope.querySelectorAll('[data-edit-id]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-edit-id');
+        var evt = state.events.find(function(item){ return item.id === id; });
+        if(evt) startEditEvent(evt);
+      });
+    });
+  }
+
+  function renderClients(){
+    var clients = uniqueClients();
+    var keyword = els.clientSearchInput ? String(els.clientSearchInput.value || '').trim() : '';
+    if(!clients.length){
+      if(els.clientSearchMeta){
+        els.clientSearchMeta.hidden = false;
+        els.clientSearchMeta.textContent = '还没有客户数据。';
+      }
+      els.clientList.innerHTML = '<div class="emptyState" style="margin-top:14px">还没有客户数据。保存档期后会自动生成。</div>';
+      return;
+    }
+    var filtered = clients.filter(function(client){ return matchesClientQuery(client, keyword); });
+    if(els.clientSearchMeta){
+      els.clientSearchMeta.hidden = !keyword;
+      els.clientSearchMeta.textContent = keyword ? ('命中 ' + filtered.length + ' / ' + clients.length + ' 位客户') : '';
+    }
+    if(!filtered.length){
+      els.clientList.innerHTML = '<div class="emptyState" style="margin-top:14px">没有搜索到匹配的客户。试试姓名、手机号或婚期。</div>';
+      return;
+    }
+    els.clientList.innerHTML = '<div class="list" style="margin-top:14px">' + filtered.map(function(client){
+      return '<div class="listItem"><div class="listHead"><div class="listMain"><div class="name">' + escapeHtml(client.name) + '</div><div class="meta">地区：' + escapeHtml(client.region || '未填写') + '</div></div><span class="badge blue">档期 ' + client.count + '</span></div><div class="meta">联系电话：' + escapeHtml(client.phone || '未填写') + '</div><div class="meta">婚期：' + escapeHtml(formatClientDates(client)) + '</div></div>';
+    }).join('') + '</div>';
+  }
+
+  function renderWorkspace(){
+    var evt = getNextEvent();
+    if(!evt){
+      els.workspaceHero.innerHTML = '<div class="emptyState">还没有档期。先添加一个，执行中枢才会根据最近档期自动生成当天流程。</div>';
+      if(els.workspaceClientInfo) els.workspaceClientInfo.innerHTML = '';
+      if(els.workspaceOps) els.workspaceOps.innerHTML = '';
+      if(els.workspaceAlerts) els.workspaceAlerts.innerHTML = '';
+      if(els.workspaceTimeline) els.workspaceTimeline.innerHTML = '';
+      if(els.workspaceFlowChecklist) els.workspaceFlowChecklist.innerHTML = '';
+      if(els.workspaceStaffChecklist) els.workspaceStaffChecklist.innerHTML = '';
+      return;
+    }
+
+    var ritualPlan = getRitualPlan(evt);
+    var ritualState = getEventCustoms(evt.id, evt);
+    var checkState = getEventChecks(evt.id);
+    var checkItems = getCheckItems();
+    var staffItems = checkItems.filter(function(item){ return item.phase === '工作人员'; });
+    var flowItems = checkItems.filter(function(item){ return item.phase !== '工作人员'; });
+
+    var checkDone = countCheckedByIds(checkState, checkItems);
+    var ritualDone = countCheckedByIds(ritualState, ritualPlan);
+    var staffDone = countCheckedByIds(checkState, staffItems);
+    var teamCount = [evt.staffHost, evt.staffPhoto, evt.staffVideo].filter(Boolean).length;
+
+    var hero = '<div class="listItem">' +
+      '<div class="listHead"><div class="listMain"><div class="name">' + escapeHtml((evt.groomName || '新郎') + ' / ' + (evt.brideName || '新娘')) + '</div><div class="meta">' + escapeHtml(formatDateCN(evt.date) + ' · ' + (evt.ceremony || '未设时间') + ' · ' + (evt.venue || '未设场地')) + '</div></div><span class="badge ' + (evt.status === '已完成' ? 'green' : (evt.status === '执行中' ? 'blue' : 'orange')) + '">' + escapeHtml(evt.status || '待跟进') + '</span></div>' +
+      '<div class="listMeta"><span class="badge">客户：' + escapeHtml(getClientName(evt) || '未关联') + '</span><span class="badge">地区：' + escapeHtml(evt.region || '未填') + '</span><span class="badge">接亲：' + escapeHtml(evt.distance || '0') + ' 分钟</span></div>' +
+    '</div>';
+    els.workspaceHero.innerHTML = hero;
+
+    if(els.workspaceClientInfo){
+      var rows = [
+        ['当前客户', getClientName(evt) || '未关联'],
+        ['男方电话', evt.groomPhone || '未填写'],
+        ['女方电话', evt.bridePhone || '未填写'],
+        ['男方地址', evt.groomAddr || '未填写'],
+        ['女方地址', evt.brideAddr || '未填写'],
+        ['档期备注', evt.note || '无']
+      ];
+      els.workspaceClientInfo.innerHTML = rows.map(function(row){
+        return '<div class="kvRow"><span class="k">' + escapeHtml(row[0]) + '</span><span class="v">' + escapeHtml(row[1]) + '</span></div>';
+      }).join('');
+    }
+
+    if(els.workspaceOps){
+      var staffInfoItems = getStaffInfoItems(evt);
+      var staffInfoHtml = '<div class="checkGroupHead"><div class="checkGroupTitle">工作人员信息</div><button class="checkGroupAddBtn" type="button" data-staff-add-root="1">+ 添加</button></div>';
+      if(!staffInfoItems.length){
+        staffInfoHtml += '<div class="emptyState" style="margin-top:10px">还没有工作人员信息。先添加任务、姓名和电话，现场联系会更快。</div>';
+      }else{
+        staffInfoHtml += '<div class="checkList">' + staffInfoItems.map(function(item){
+          return '<div class="checkRow" data-staff-row data-staff-id="' + escapeHtml(item.id) + '"><div style="flex:1;min-width:0"><div class="checkLabel">任务：' + escapeHtml(item.task || '未填写') + '</div><div class="checkHint">姓名：' + escapeHtml(item.name || '未填写') + '</div><div class="checkHint">电话：' + escapeHtml(item.phone || '未填写') + '</div></div><div class="rowActionGroup"><button class="rowAddBtn" type="button" data-staff-add-after="' + escapeHtml(item.id) + '">添加</button><button class="ghostBtn rowEditBtn" type="button" data-staff-edit="' + escapeHtml(item.id) + '">编辑</button></div></div>';
+        }).join('') + '</div>';
+      }
+      els.workspaceOps.innerHTML = staffInfoHtml;
+      bindStaffInfoManage(els.workspaceOps, evt);
+    }
+
+    var timeline = getTimelineItems(evt);
+    if(els.workspaceTimeline){
+      els.workspaceTimeline.innerHTML = '<div class="toolbar"><button class="checkGroupAddBtn" type="button" data-timeline-add-root="1">+ 添加时间流程</button></div>' + timeline.map(function(item){
+        return '<div class="timelineItem" data-timeline-row data-timeline-id="' + escapeHtml(item.id) + '"><div class="timelineTime">' + escapeHtml(item.time || '--:--') + '</div><div class="timelineRowCard"><div class="timelineCard"><div class="tTitle">' + escapeHtml(item.title) + '</div><div class="tDesc">' + escapeHtml(item.desc) + '</div></div><div class="timelineRowActions"><button class="timelineActionBtn" type="button" data-timeline-remove="' + escapeHtml(item.id) + '">删除</button><button class="ghostBtn rowEditBtn" type="button" data-timeline-edit="' + escapeHtml(item.id) + '">编辑</button></div></div></div>';
+      }).join('');
+      bindTimelineManage(els.workspaceTimeline, evt);
+    }
+
+    if(els.workspaceAlerts){
+      var alerts = [];
+      alerts.push('<div class="notice">地区提醒：' + escapeHtml(getRegionAdvice(evt)) + '</div>');
+      alerts.push('<div class="notice" style="margin-top:10px">当前客户：' + escapeHtml(getClientName(evt) || '未关联') + '，建议把双方父母、酒店、化妆和车队联系人统一在一个联络组里。</div>');
+      if(!evt.venue) alerts.push('<div class="notice" style="margin-top:10px">场地未填写：建议尽快补全酒店 / 厅位，避免当天对接空转。</div>');
+      if(teamCount < 3) alerts.push('<div class="notice" style="margin-top:10px">团队分工未满：主持 / 摄影 / 摄像还有未填写项，建议提前补齐。</div>');
+      if(Number(evt.distance || 0) >= 60) alerts.push('<div class="notice" style="margin-top:10px">接亲距离偏长：建议预留更宽的交通缓冲，避免压缩仪式时间。</div>');
+      var enabledFlags = [evt.door ? '堵门' : '', evt.tea ? '敬茶' : '', evt.returnHome ? '回门' : ''].filter(Boolean);
+      alerts.push('<div class="notice" style="margin-top:10px">当前启用风俗：' + escapeHtml(enabledFlags.length ? enabledFlags.join(' / ') : '基础流程') + '。风俗节点完成度 ' + ritualDone + ' / ' + ritualPlan.length + '。</div>');
+      alerts.push('<div class="notice" style="margin-top:10px">总清单完成度：' + checkDone + ' / ' + checkItems.length + '。工作人员流程完成度：' + staffDone + ' / ' + staffItems.length + '。</div>');
+      els.workspaceAlerts.innerHTML = alerts.join('');
+    }
+
+    if(els.workspaceFlowChecklist){
+      els.workspaceFlowChecklist.innerHTML = renderCheckMarkup(flowItems, checkState, 'event', evt.id, { manage:true });
+      bindEventCheckInputs(els.workspaceFlowChecklist, evt);
+      bindChecklistEditButtons(els.workspaceFlowChecklist);
+    }
+    if(els.workspaceStaffChecklist){
+      els.workspaceStaffChecklist.innerHTML = renderCheckMarkup(staffItems, checkState, 'event', evt.id, { manage:true });
+      bindEventCheckInputs(els.workspaceStaffChecklist, evt);
+      bindChecklistEditButtons(els.workspaceStaffChecklist);
+    }
+  }
+
+  function renderTemplateChecklist(){
+    var checkItems = getCheckItems();
+    var evt = getNextEvent();
+    if(els.checklistClientHero){
+      if(!evt){
+        els.checklistClientHero.innerHTML = '<div class="emptyState">还没有当前客户。先新增档期，清单会自动绑定到最近档期。</div>';
+      }else{
+        els.checklistClientHero.innerHTML = '<div class="listItem"><div class="listHead"><div class="listMain"><div class="name">' + escapeHtml(getClientName(evt) || '未关联') + '</div><div class="meta">' + escapeHtml((evt.groomName || '新郎未填') + ' / ' + (evt.brideName || '新娘未填')) + '</div></div><span class="badge blue">' + escapeHtml(evt.region || '未设地区') + '</span></div><div class="meta">' + escapeHtml(formatDateCN(evt.date) + ' · ' + (evt.venue || '未设场地') + ' · ' + (evt.ceremony || '未设时间')) + '</div></div>';
+      }
+    }
+
+    if(els.currentChecklist){
+      if(!evt){
+        els.currentChecklist.innerHTML = '';
+      }else{
+        var currentState = getEventChecks(evt.id);
+        els.currentChecklist.innerHTML = renderCheckMarkup(checkItems, currentState, 'event', evt.id, { manage:true });
+        bindEventCheckInputs(els.currentChecklist, evt);
+        bindChecklistEditButtons(els.currentChecklist);
+      }
+    }
+
+    els.templateChecklist.innerHTML = renderCheckMarkup(checkItems, state.templateChecks, 'template', '', { manage:true });
+    bindChecklistEditButtons(els.templateChecklist);
+    els.templateChecklist.querySelectorAll('[data-template-check]').forEach(function(box){
+      box.addEventListener('change', function(){
+        state.templateChecks[box.getAttribute('data-template-check')] = box.checked;
+        saveState(false);
+        showSaved('已自动保存');
+        renderTemplateChecklist();
+      });
+    });
+    syncTemplateLibraryCollapsed(false);
+  }
+
+  function getEventChecks(eventId){
+    if(!state.checksByEvent[eventId]){
+      state.checksByEvent[eventId] = Object.assign({}, state.templateChecks);
+    }
+    getCheckItems().forEach(function(item){
+      if(typeof state.checksByEvent[eventId][item.id] === 'undefined') state.checksByEvent[eventId][item.id] = false;
+    });
+    return state.checksByEvent[eventId];
+  }
+
+  function renderCheckMarkup(items, valueMap, mode, eventId, options){
+    options = options || {};
+    var manage = !!options.manage;
+    var currentPhase = '';
+    return items.map(function(item){
+      var block = '';
+      var phaseText = item.phase || '未分组';
+      if(phaseText !== currentPhase){
+        currentPhase = phaseText;
+        if(manage && mode !== 'ritual'){
+          block += '<div class="checkGroupHead" data-group-head data-phase-key="' + escapeHtml(phaseText) + '"><div class="checkGroupTitle">' + escapeHtml(currentPhase) + '</div><button class="checkGroupAddBtn" type="button" data-inline-add="' + escapeHtml(phaseText) + '">+ 添加</button></div>';
+        }else{
+          block += '<div class="checkGroupTitle">' + escapeHtml(currentPhase) + '</div>';
+        }
+      }
+      var checked = valueMap && valueMap[item.id] ? ' checked' : '';
+      var attrs = mode === 'template'
+        ? ' data-template-check="' + item.id + '"'
+        : mode === 'ritual'
+          ? ' data-ritual-event="' + eventId + '" data-ritual-id="' + item.id + '"'
+          : ' data-check-event="' + eventId + '" data-check-id="' + item.id + '"';
+      var rowActions = '';
+      if(mode !== 'ritual' && manage){
+        rowActions = '<div class="rowActionGroup"><button class="dangerBtn rowEditBtn" type="button" data-item-remove="' + escapeHtml(item.id) + '">删除</button><button class="ghostBtn rowEditBtn" type="button" data-item-edit="' + escapeHtml(item.id) + '">编辑</button></div>';
+      }
+      block += '<div class="checkRow" data-check-row data-item-id="' + escapeHtml(item.id) + '" data-phase-key="' + escapeHtml(phaseText) + '"><label class="checkMain"><input type="checkbox"' + attrs + checked + ' /><div><div class="checkLabel">' + escapeHtml(item.label || item.title) + '</div><div class="checkHint">' + escapeHtml(item.hint || item.desc || '') + '</div></div></label>' + rowActions + '</div>';
+      return block;
+    }).join('');
+  }
+
+  function bindEventCheckInputs(scope, evt){
+    if(!scope || !evt) return;
+    scope.querySelectorAll('[data-check-event]').forEach(function(box){
+      box.addEventListener('change', function(){
+        var eid = box.getAttribute('data-check-event');
+        var cid = box.getAttribute('data-check-id');
+        var current = getEventChecks(eid);
+        current[cid] = box.checked;
+        state.checksByEvent[eid] = current;
+        saveState(false);
+        showSaved('已自动保存');
+        refreshAll();
+      });
+    });
+  }
+
+  function bindRitualCheckInputs(scope, evt){
+    if(!scope || !evt) return;
+    scope.querySelectorAll('[data-ritual-event]').forEach(function(box){
+      box.addEventListener('change', function(){
+        var eid = box.getAttribute('data-ritual-event');
+        var rid = box.getAttribute('data-ritual-id');
+        var current = getEventCustoms(eid, evt);
+        current[rid] = box.checked;
+        state.customsByEvent[eid] = current;
+        saveState(false);
+        showSaved('已自动保存');
+        refreshAll();
+      });
+    });
+  }
+
+  function countCheckedByIds(valueMap, items){
+    return items.reduce(function(total, item){
+      return total + (valueMap && valueMap[item.id] ? 1 : 0);
+    }, 0);
+  }
+
+  function getRitualPlan(evt){
+    if(!evt) return [];
+    var regionText = evt.region || '当地';
+    var venueText = evt.venue || '酒店';
+    var regionKey = resolveRegionKey(evt.region);
+    var plan = [
+      { id:'ritual_sync', phase:'接亲前', label:'团队碰头', hint:'统一集合点、机位、收音和备用联络。' },
+      { id:'ritual_route', phase:'接亲前', label:'路线确认', hint:'从 ' + regionText + ' 到 ' + venueText + ' 的时间与车队顺序再次确认。' }
+    ];
+    if(evt.door) plan.push({ id:'ritual_door', phase:'到娘家', label:'堵门环节', hint:'红包数量、互动游戏和开门口号提前交底。' });
+    plan.push({ id:'ritual_greet', phase:'到娘家', label:'见长辈与称呼确认', hint:'先确认双方长辈称呼、站位和说话顺序。' });
+    if(evt.tea) plan.push({ id:'ritual_tea', phase:'出门前', label:'敬茶 / 改口', hint:'茶具、跪垫、改口红包和摄影机位提前到位。' });
+    plan.push({ id:'ritual_depart', phase:'出门', label:'出门跟拍', hint:'保留拥抱、合影、上车、车队出发的连续画面。' });
+
+    getRegionLibraryItems(regionKey).forEach(function(item){
+      plan.push({
+        id: 'ritual_' + item.id,
+        phase: item.phase || (regionKey + '风俗'),
+        label: item.label || item.title || '地区风俗',
+        hint: item.hint || item.desc || '请补充执行说明。'
+      });
+    });
+
+    plan.push({ id:'ritual_rehearsal', phase:'仪式前', label:'到酒店彩排', hint:'入场节奏、音乐点、走位和上台顺序快速过一遍。' });
+    plan.push({ id:'ritual_toast', phase:'宴会中', label: evt.banquet === '晚宴' ? '晚宴敬酒' : '午宴敬酒', hint: evt.banquet === '晚宴' ? '注意节奏控制，给拍摄和互动预留缓冲。' : '流程偏紧凑，空档尽量缩短，敬酒路线提前确认。' });
+    plan.push({ id:'ritual_sendoff', phase:'收尾', label:'送客与收尾', hint:'确认尾款、礼品、遗留物、双方反馈和返程。' });
+    if(evt.returnHome) plan.push({ id:'ritual_return', phase:'后续', label:'回门安排', hint:'提醒新人回门时间、礼品准备和是否需要再次拍摄。' });
+    return plan;
+  }
+
+  function getEventCustoms(eventId, evt){
+    if(!eventId) return {};
+    if(!state.customsByEvent[eventId]) state.customsByEvent[eventId] = {};
+    var ritualState = state.customsByEvent[eventId];
+    getRitualPlan(evt).forEach(function(item){
+      if(typeof ritualState[item.id] === 'undefined') ritualState[item.id] = false;
+    });
+    return ritualState;
+  }
+
+  function getRegionAdvice(evt){
+    var region = (evt && evt.region) ? evt.region : '';
+    var regionKey = resolveRegionKey(region);
+    var libraryCount = getRegionLibraryItems(regionKey).length;
+    if(/连云港|赣榆|江苏|苏州|南京|无锡/.test(region)) return '江苏地区通常更重视接亲节奏和敬茶衔接，建议把堵门、敬茶、出门时间切得更细。当前已挂载 ' + libraryCount + ' 条地区风俗内容。';
+    if(/河南|山东|河北|山西|北京|天津/.test(region)) return '华北流程里堵门互动往往更完整，红包、游戏时间和情绪收口要提前控住。当前已挂载 ' + libraryCount + ' 条地区风俗内容。';
+    if(/广东|福建|潮汕|汕头|厦门|深圳|广州/.test(region)) return '华南常更重视敬茶礼序与长辈称呼，建议提前排好站位、茶杯顺序和改口节点。当前已挂载 ' + libraryCount + ' 条地区风俗内容。';
+    if(/四川|重庆|湖南|湖北|贵州|云南/.test(region)) return '西南 / 华中婚礼通常更看重现场气氛与流程推进，建议提前统一主持口径和节奏。当前已挂载 ' + libraryCount + ' 条地区风俗内容。';
+    return '当前地区使用“' + regionKey + '”风俗库，共 ' + libraryCount + ' 条内容。正式执行前最好再次确认：堵门是否保留、敬茶顺序、回门安排与长辈礼数。';
+  }
+
+  function renderCustoms(){
+    if(!els.customsPlan || !els.customsNotes || !els.customsChecklist) return;
+    var evt = getNextEvent();
+    var preferredRegion = evt ? resolveRegionKey(evt.region) : (els.customsRegionSelect && els.customsRegionSelect.value ? els.customsRegionSelect.value : '通用');
+    renderRegionLibraryPanel(preferredRegion, evt);
+
+    if(!evt){
+      els.customsPlan.innerHTML = '<div class="emptyState">还没有档期。你现在也可以先维护地区风俗库；新增档期后会自动带入到这里。</div>';
+      els.customsChecklist.innerHTML = '';
+      return;
+    }
+
+    var plan = getRitualPlan(evt);
+    var ritualState = getEventCustoms(evt.id, evt);
+    els.customsPlan.innerHTML = '<div class="timeline">' + plan.map(function(item){
+      return '<div class="timelineItem"><div class="timelineTime">' + escapeHtml(item.phase) + '</div><div class="timelineCard"><div class="tTitle">' + escapeHtml(item.label) + '</div><div class="tDesc">' + escapeHtml(item.hint) + '</div></div></div>';
+    }).join('') + '</div>';
+
+    var enabledFlags = [evt.door ? '堵门' : '', evt.tea ? '敬茶' : '', evt.returnHome ? '回门' : ''].filter(Boolean);
+    els.customsNotes.innerHTML += '<div class="notice" style="margin-top:10px">当前已启用：' + escapeHtml(enabledFlags.length ? enabledFlags.join(' / ') : '按基础流程执行') + '。建议和双方家庭再确认一次是否需要压缩或增强互动。</div>';
+    if(evt.note) els.customsNotes.innerHTML += '<div class="notice" style="margin-top:10px">档期备注：' + escapeHtml(evt.note) + '</div>';
+
+    els.customsChecklist.innerHTML = renderCheckMarkup(plan, ritualState, 'ritual', evt.id);
+    bindRitualCheckInputs(els.customsChecklist, evt);
+  }
+
+  function suggestTime(base, diffMinutes){
+    if(!base) return '--:--';
+    var parts = base.split(':');
+    var d = new Date();
+    d.setHours(Number(parts[0] || 0), Number(parts[1] || 0), 0, 0);
+    d.setMinutes(d.getMinutes() + diffMinutes);
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function collectForm(){
+    var clientValue = document.getElementById('e_client').value;
+    var clientName = '';
+    if(clientValue === '__new__') clientName = document.getElementById('e_newClientName').value.trim();
+    else clientName = clientValue;
+
+    return {
+      id: state.ui.editingId || uid(),
+      date: document.getElementById('e_date').value,
+      ceremony: document.getElementById('e_ceremony').value,
+      banquet: document.getElementById('e_banquet').value,
+      venue: document.getElementById('e_venue').value.trim(),
+      status: document.getElementById('e_status').value,
+      fee: document.getElementById('e_fee').value.trim(),
+      note: document.getElementById('e_note').value.trim(),
+      groomName: document.getElementById('g_name').value.trim(),
+      groomPhone: document.getElementById('g_phone').value.trim(),
+      groomAddr: document.getElementById('g_addr').value.trim(),
+      brideName: document.getElementById('b_name').value.trim(),
+      bridePhone: document.getElementById('b_phone').value.trim(),
+      brideAddr: document.getElementById('b_addr').value.trim(),
+      clientName: clientName,
+      region: document.getElementById('e_region').value.trim(),
+      distance: document.getElementById('e_distance').value.trim(),
+      door: document.getElementById('e_door').value === '1',
+      tea: document.getElementById('e_tea').value === '1',
+      returnHome: document.getElementById('e_return').value === '1',
+      staffHost: document.getElementById('staff_host').value.trim(),
+      staffPhoto: document.getElementById('staff_photo').value.trim(),
+      staffVideo: document.getElementById('staff_video').value.trim(),
+      staffHostArrive: document.getElementById('staff_hostArrive').value,
+      staffPhotoArrive: document.getElementById('staff_photoArrive').value,
+      staffVideoArrive: document.getElementById('staff_videoArrive').value,
+      timelineItems: findEditingEvent() && Array.isArray(findEditingEvent().timelineItems) ? JSON.parse(JSON.stringify(findEditingEvent().timelineItems)) : null,
+      staffInfoItems: findEditingEvent() && Array.isArray(findEditingEvent().staffInfoItems) ? JSON.parse(JSON.stringify(findEditingEvent().staffInfoItems)) : null,
+      updatedAt: Date.now(),
+      createdAt: findEditingEvent() ? findEditingEvent().createdAt : Date.now()
+    };
+  }
+
+  function saveEvent(){
+    var payload = collectForm();
+    if(!payload.date){
+      alert('请先填写日期。');
+      setStep(0);
+      return;
+    }
+    if(!payload.clientName){
+      var fallbackClient = [payload.groomName, payload.brideName].filter(Boolean).join(' & ');
+      payload.clientName = fallbackClient;
+    }
+    var idx = state.events.findIndex(function(item){ return item.id === payload.id; });
+    if(idx >= 0) state.events[idx] = payload;
+    else state.events.push(payload);
+    if(!state.checksByEvent[payload.id]){
+      state.checksByEvent[payload.id] = Object.assign({}, state.templateChecks);
+    }
+    getEventCustoms(payload.id, payload);
+    saveState();
+    closeModal('event');
+    refreshAll();
+    switchScreen('schedule');
+  }
+
+  function deleteEvent(){
+    var current = findEditingEvent();
+    if(!current) return;
+    if(!confirm('确认删除这个档期吗？')) return;
+    state.events = state.events.filter(function(item){ return item.id !== current.id; });
+    delete state.checksByEvent[current.id];
+    delete state.customsByEvent[current.id];
+    saveState();
+    closeModal('event');
+    resetForm();
+    refreshAll();
+  }
+
+  function findEditingEvent(){
+    return state.events.find(function(item){ return item.id === state.ui.editingId; }) || null;
+  }
+
+  function resetForm(){
+    state.ui.editingId = null;
+    document.getElementById('eventModalTitle').textContent = '新增档期';
+    document.getElementById('e_date').value = '';
+    document.getElementById('e_ceremony').value = '';
+    document.getElementById('e_banquet').value = '午宴';
+    document.getElementById('e_venue').value = '';
+    document.getElementById('e_status').value = '待跟进';
+    document.getElementById('e_fee').value = '';
+    document.getElementById('e_note').value = '';
+    document.getElementById('g_name').value = '';
+    document.getElementById('g_phone').value = '';
+    document.getElementById('g_addr').value = '';
+    document.getElementById('b_name').value = '';
+    document.getElementById('b_phone').value = '';
+    document.getElementById('b_addr').value = '';
+    document.getElementById('e_newClientName').value = '';
+    document.getElementById('e_region').value = '';
+    document.getElementById('e_distance').value = '';
+    document.getElementById('e_door').value = '1';
+    document.getElementById('e_tea').value = '1';
+    document.getElementById('e_return').value = '1';
+    document.getElementById('staff_host').value = '';
+    document.getElementById('staff_photo').value = '';
+    document.getElementById('staff_video').value = '';
+    document.getElementById('staff_hostArrive').value = '';
+    document.getElementById('staff_photoArrive').value = '';
+    document.getElementById('staff_videoArrive').value = '';
+    updateClientSelect('');
+    els.deleteEventBtn.classList.add('hidden');
+    setStep(0);
+  }
+
+  function startNewEvent(){
+    resetForm();
+    openModal('event');
+  }
+
+  function startEditEvent(evt){
+    state.ui.editingId = evt.id;
+    document.getElementById('eventModalTitle').textContent = '编辑档期';
+    document.getElementById('e_date').value = evt.date || '';
+    document.getElementById('e_ceremony').value = evt.ceremony || '';
+    document.getElementById('e_banquet').value = evt.banquet || '午宴';
+    document.getElementById('e_venue').value = evt.venue || '';
+    document.getElementById('e_status').value = evt.status || '待跟进';
+    document.getElementById('e_fee').value = evt.fee || '';
+    document.getElementById('e_note').value = evt.note || '';
+    document.getElementById('g_name').value = evt.groomName || '';
+    document.getElementById('g_phone').value = evt.groomPhone || '';
+    document.getElementById('g_addr').value = evt.groomAddr || '';
+    document.getElementById('b_name').value = evt.brideName || '';
+    document.getElementById('b_phone').value = evt.bridePhone || '';
+    document.getElementById('b_addr').value = evt.brideAddr || '';
+    document.getElementById('e_region').value = evt.region || '';
+    document.getElementById('e_distance').value = evt.distance || '';
+    document.getElementById('e_door').value = evt.door ? '1' : '0';
+    document.getElementById('e_tea').value = evt.tea ? '1' : '0';
+    document.getElementById('e_return').value = evt.returnHome ? '1' : '0';
+    document.getElementById('staff_host').value = evt.staffHost || '';
+    document.getElementById('staff_photo').value = evt.staffPhoto || '';
+    document.getElementById('staff_video').value = evt.staffVideo || '';
+    document.getElementById('staff_hostArrive').value = evt.staffHostArrive || '';
+    document.getElementById('staff_photoArrive').value = evt.staffPhotoArrive || '';
+    document.getElementById('staff_videoArrive').value = evt.staffVideoArrive || '';
+
+    var clients = uniqueClients().map(function(item){ return item.name; });
+    if(evt.clientName && clients.indexOf(evt.clientName) >= 0){
+      updateClientSelect(evt.clientName);
+      document.getElementById('e_newClientName').value = '';
+    }else if(evt.clientName){
+      updateClientSelect('__new__');
+      document.getElementById('e_newClientName').value = evt.clientName;
+    }else{
+      updateClientSelect('');
+      document.getElementById('e_newClientName').value = '';
+    }
+
+    els.deleteEventBtn.classList.remove('hidden');
+    setStep(0);
+    openModal('event');
+  }
+
+  function refreshDataCenter(){
+    var total = state.events.length;
+    var clients = uniqueClients().length;
+    var sortedEvents = sortEvents(state.events);
+    var latest = sortedEvents.length ? sortedEvents[sortedEvents.length - 1] : null;
+    els.dataCenterSummary.textContent = total ? ('当前共保存 ' + total + ' 条档期、' + clients + ' 位客户。最近更新：' + formatDate(latest.date) + '。') : '当前还没有数据。你可以先新增档期，或导入之前导出的 JSON。';
+    var rows = [
+      ['存储方式','浏览器本地存储'],
+      ['总档期', String(total)],
+      ['客户数量', String(clients)],
+      ['待执行', String(state.events.filter(function(evt){ return evt.status !== '已完成'; }).length)],
+      ['已完成', String(state.events.filter(function(evt){ return evt.status === '已完成'; }).length)]
+    ];
+    els.dataCenterDetails.innerHTML = rows.map(function(row){
+      return '<div class="kvRow"><span class="k">' + escapeHtml(row[0]) + '</span><span class="v">' + escapeHtml(row[1]) + '</span></div>';
+    }).join('');
+  }
+
+  function safeFileName(text){
+    return String(text || '导出').replace(/[\\/:*?"<>|]+/g, '_').replace(/\s+/g, '_');
+  }
+
+  function downloadBlob(blob, filename){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 1000);
+  }
+
+  function syncCloneFormState(source, clone){
+    var sourceChecks = source.querySelectorAll('input[type="checkbox"]');
+    var cloneChecks = clone.querySelectorAll('input[type="checkbox"]');
+    sourceChecks.forEach(function(box, index){
+      if(!cloneChecks[index]) return;
+      if(box.checked) cloneChecks[index].setAttribute('checked', 'checked');
+      else cloneChecks[index].removeAttribute('checked');
+    });
+  }
+
+  function nodeToPngBlob(node, options){
+    options = options || {};
+    return new Promise(function(resolve, reject){
+      if(!node){
+        reject(new Error('缺少导出节点'));
+        return;
+      }
+      var clone = node.cloneNode(true);
+      syncCloneFormState(node, clone);
+      (options.removeSelectors || []).forEach(function(selector){
+        clone.querySelectorAll(selector).forEach(function(el){ el.remove(); });
+      });
+      var rect = node.getBoundingClientRect();
+      var width = Math.max(Math.ceil(rect.width || node.scrollWidth || 320), 320);
+      var height = Math.max(Math.ceil(node.scrollHeight || rect.height || 160), 160);
+      var padding = options.printMode ? 26 : 18;
+      var outerBg = options.printMode ? '#ffffff' : '#f3f5f9';
+      var wrap = document.createElement('div');
+      wrap.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+      wrap.style.width = width + 'px';
+      wrap.style.padding = padding + 'px';
+      wrap.style.background = outerBg;
+      wrap.style.color = '#111827';
+      wrap.style.fontFamily = '-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif';
+      if(options.title){
+        var head = document.createElement('div');
+        head.style.marginBottom = '12px';
+        head.style.padding = '12px 14px';
+        head.style.background = '#ffffff';
+        head.style.borderRadius = '16px';
+        head.style.border = '1px solid #e5e7eb';
+        head.innerHTML = '<div style="font-size:15px;font-weight:900;">' + escapeHtml(options.title) + '</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">导出时间：' + escapeHtml(new Date().toLocaleString()) + '</div>';
+        wrap.appendChild(head);
+      }
+      wrap.appendChild(clone);
+      var styleText = document.querySelector('style') ? document.querySelector('style').textContent : '';
+      var serialized = new XMLSerializer().serializeToString(wrap);
+      var svgWidth = width + padding * 2;
+      var extra = options.title ? 84 : 0;
+      var svgHeight = height + padding * 2 + extra;
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgWidth + '" height="' + svgHeight + '" viewBox="0 0 ' + svgWidth + ' ' + svgHeight + '"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>body{margin:0;background:' + outerBg + ';}' + styleText + '</style>' + serialized + '</div></foreignObject></svg>';
+      var svgBlob = new Blob([svg], { type:'image/svg+xml;charset=utf-8' });
+      var url = URL.createObjectURL(svgBlob);
+      var img = new Image();
+      img.onload = function(){
+        try{
+          var scale = options.printMode ? Math.max(3, (window.devicePixelRatio || 1) * 1.8) : Math.max(2, window.devicePixelRatio || 1);
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.round(svgWidth * scale);
+          canvas.height = Math.round(svgHeight * scale);
+          var ctx = canvas.getContext('2d');
+          ctx.scale(scale, scale);
+          ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
+          canvas.toBlob(function(blob){
+            URL.revokeObjectURL(url);
+            if(blob) resolve(blob);
+            else reject(new Error('图片生成失败'));
+          }, 'image/png');
+        }catch(err){
+          URL.revokeObjectURL(url);
+          reject(err);
+        }
+      };
+      img.onerror = function(){
+        URL.revokeObjectURL(url);
+        reject(new Error('图片渲染失败'));
+      };
+      img.src = url;
+    });
+  }
+
+  function prepareNodeCapture(node){
+    var screen = node && node.closest ? node.closest('.screen') : null;
+    if(!screen || screen.classList.contains('active')) return null;
+    var oldStyle = screen.getAttribute('style');
+    screen.style.display = 'block';
+    screen.style.position = 'absolute';
+    screen.style.left = '-99999px';
+    screen.style.top = '0';
+    screen.style.width = Math.max(320, Math.min((window.innerWidth || 390) - 28, 980)) + 'px';
+    screen.style.zIndex = '-1';
+    screen.style.pointerEvents = 'none';
+    return function(){
+      if(oldStyle === null) screen.removeAttribute('style');
+      else screen.setAttribute('style', oldStyle);
+    };
+  }
+
+
+  function mountNodeForCapture(node){
+    if(!node) return null;
+    if(document.body.contains(node)) return null;
+    var host = document.createElement('div');
+    host.style.position = 'absolute';
+    host.style.left = '-99999px';
+    host.style.top = '0';
+    host.style.width = (node.style && node.style.width ? node.style.width : '760px');
+    host.style.pointerEvents = 'none';
+    host.style.opacity = '0';
+    host.style.zIndex = '-1';
+    host.appendChild(node);
+    document.body.appendChild(host);
+    return function(){
+      host.remove();
+    };
+  }
+
+  function createPrintSheet(title, subtitle){
+    var root = document.createElement('div');
+    root.style.width = '794px';
+    root.style.minHeight = '1123px';
+    root.style.background = '#ffffff';
+    root.style.color = '#0f172a';
+    root.style.border = '1px solid #d6dbe3';
+    root.style.borderRadius = '14px';
+    root.style.overflow = 'hidden';
+    root.style.boxSizing = 'border-box';
+    root.style.boxShadow = '0 10px 30px rgba(15,23,42,.05)';
+    root.style.fontFamily = '-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif';
+    root.style.lineHeight = '1.5';
+
+    var head = document.createElement('div');
+    head.style.padding = '34px 38px 20px';
+    head.style.borderBottom = '2px solid #e5e7eb';
+    head.innerHTML = '<div style="font-size:11px;font-weight:800;color:#64748b;letter-spacing:.08em;">' + escapeHtml(getBrandName()) + '</div>' +
+      '<div style="font-size:26px;font-weight:900;margin-top:6px;line-height:1.28;">' + escapeHtml(title || '打印导出') + '</div>' +
+      (subtitle ? ('<div style="font-size:12px;color:#475569;margin-top:8px;line-height:1.6;">' + escapeHtml(subtitle) + '</div>') : '') +
+      '<div style="font-size:11px;color:#64748b;margin-top:8px;">A4 纵向排版 · 单客户打印 · 内容较多时自动导出高清长图</div>' +
+      '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">导出时间：' + escapeHtml(new Date().toLocaleString()) + '</div>';
+    root.appendChild(head);
+
+    var body = document.createElement('div');
+    body.style.padding = '22px 38px 34px';
+    body.style.display = 'grid';
+    body.style.gap = '14px';
+    root.appendChild(body);
+    return { root: root, body: body };
+  }
+
+  function createPrintSection(title, note){
+    var section = document.createElement('section');
+    section.style.border = '1px solid #e5e7eb';
+    section.style.borderRadius = '12px';
+    section.style.padding = '14px 16px';
+    section.style.background = '#ffffff';
+    section.style.boxSizing = 'border-box';
+    section.style.breakInside = 'avoid';
+
+    var head = document.createElement('div');
+    head.style.display = 'flex';
+    head.style.alignItems = 'flex-start';
+    head.style.justifyContent = 'space-between';
+    head.style.gap = '10px';
+    var noteHtml = note ? ('<div style="font-size:11px;color:#64748b;max-width:60%;text-align:right;line-height:1.5;">' + escapeHtml(note) + '</div>') : '';
+    head.innerHTML = '<div style="font-size:15px;font-weight:900;color:#0f172a;">' + escapeHtml(title || '') + '</div>' + noteHtml;
+    section.appendChild(head);
+
+    var body = document.createElement('div');
+    body.style.marginTop = '10px';
+    body.style.display = 'grid';
+    body.style.gap = '4px';
+    section.appendChild(body);
+    return { section: section, body: body };
+  }
+
+  function createPrintCheckRow(label, note, checked, options){
+    options = options || {};
+    var row = document.createElement('div');
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = '22px 1fr';
+    row.style.gap = '10px';
+    row.style.alignItems = 'start';
+    row.style.padding = options.compact ? '5px 0' : '7px 0';
+    row.style.borderBottom = options.noDivider ? 'none' : '1px dashed #e5e7eb';
+    row.style.breakInside = 'avoid';
+    var noteText = note == null ? '' : String(note);
+    row.innerHTML = '<div style="font-size:16px;line-height:1;color:#0f172a;">' + (checked ? '☑' : '☐') + '</div>' +
+      '<div><div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.45;">' + escapeHtml(label || '未命名') + '</div>' +
+      '<div style="font-size:11px;color:#64748b;margin-top:3px;line-height:1.6;white-space:pre-wrap;">' + escapeHtml(noteText || ' ') + '</div></div>';
+    return row;
+  }
+
+  function appendPrintKvRows(target, rows){
+    if(!target || !Array.isArray(rows)) return;
+    if(!rows.length){
+      target.appendChild(createPrintCheckRow('暂无内容', ' ', false, { noDivider:true }));
+      return;
+    }
+    rows.forEach(function(row, index){
+      target.appendChild(createPrintCheckRow(row[0] || '', row[1] || '', false, { noDivider:index === rows.length - 1 }));
+    });
+  }
+
+  function appendPrintEventList(target, events){
+    if(!target) return;
+    if(!Array.isArray(events) || !events.length){
+      var empty = document.createElement('div');
+      empty.style.fontSize = '12px';
+      empty.style.color = '#64748b';
+      empty.textContent = '暂无内容。';
+      target.appendChild(empty);
+      return;
+    }
+    events.forEach(function(evt){
+      var row = document.createElement('div');
+      row.style.border = '1px solid #e5e7eb';
+      row.style.borderRadius = '14px';
+      row.style.padding = '10px 12px';
+      row.style.background = '#f8fafc';
+      var meta = [
+        formatDateCN(evt.date || ''),
+        evt.ceremony || '--:--',
+        evt.venue || '未填场地'
+      ].join(' · ');
+      row.innerHTML = '<div style="font-size:13px;font-weight:900;">' + escapeHtml(getClientName(evt) || '未关联客户') + '</div>' +
+        '<div style="font-size:11px;color:#475569;margin-top:3px;">' + escapeHtml(meta) + '</div>' +
+        '<div style="font-size:11px;color:#64748b;margin-top:6px;">状态：' + escapeHtml(evt.status || '待跟进') + '　地区：' + escapeHtml(evt.region || '未填') + '</div>';
+      target.appendChild(row);
+    });
+  }
+
+  function appendPrintChecklist(target, items, valueMap){
+    if(!target) return;
+    if(!Array.isArray(items) || !items.length){
+      target.appendChild(createPrintCheckRow('暂无清单', '当前没有可导出的事项。', false, { noDivider:true }));
+      return;
+    }
+    var rows = [];
+    var currentPhase = '';
+    items.forEach(function(item){
+      var phase = item.phase || '未分组';
+      if(phase !== currentPhase){
+        currentPhase = phase;
+        var phaseTitle = document.createElement('div');
+        phaseTitle.style.fontSize = '12px';
+        phaseTitle.style.fontWeight = '900';
+        phaseTitle.style.color = '#334155';
+        phaseTitle.style.marginTop = target.childNodes.length ? '10px' : '0';
+        phaseTitle.style.paddingTop = target.childNodes.length ? '10px' : '0';
+        phaseTitle.style.borderTop = target.childNodes.length ? '1px solid #eef2f7' : 'none';
+        phaseTitle.textContent = currentPhase;
+        target.appendChild(phaseTitle);
+      }
+      var checked = !!(valueMap && valueMap[item.id]);
+      var note = item.hint || item.desc || item.note || '';
+      var row = createPrintCheckRow(item.label || item.title || '未命名', note, checked);
+      rows.push(row);
+      target.appendChild(row);
+    });
+    if(rows.length){
+      rows[rows.length - 1].style.borderBottom = 'none';
+    }
+  }
+
+  function appendPrintTimeline(target, items){
+    if(!target) return;
+    if(!Array.isArray(items) || !items.length){
+      target.appendChild(createPrintCheckRow('暂无时间流程', '当前没有可导出的时间安排。', false, { noDivider:true }));
+      return;
+    }
+    items.forEach(function(item, index){
+      var label = (item.time || '--:--') + '  ' + (item.title || '未命名流程');
+      target.appendChild(createPrintCheckRow(label, item.desc || item.note || '', false, { noDivider:index === items.length - 1 }));
+    });
+  }
+
+  function appendPrintStaffInfo(target, items){
+    if(!target) return;
+    if(!Array.isArray(items) || !items.length){
+      target.appendChild(createPrintCheckRow('暂无工作人员信息', '当前没有录入工作人员。', false, { noDivider:true }));
+      return;
+    }
+    items.forEach(function(item, index){
+      var noteParts = [];
+      if(item.name) noteParts.push('姓名：' + item.name);
+      if(item.phone) noteParts.push('电话：' + item.phone);
+      var note = noteParts.join(' · ') || '未填写';
+      target.appendChild(createPrintCheckRow(item.task || '未设任务', note, false, { noDivider:index === items.length - 1 }));
+    });
+  }
+
+  function getScheduleExportEvents(){
+    var sorted = sortEvents(state.events.slice());
+    if(state.ui.activeFilter === 'done'){
+      return sorted.filter(function(evt){ return evt.status === '已完成'; });
+    }
+    if(state.ui.activeFilter === 'upcoming'){
+      return sorted.filter(function(evt){ return evt.status !== '已完成'; });
+    }
+    return sorted;
+  }
+
+  function createPrintableDashboardNode(){
+    var sheet = createPrintSheet('首页打印版', '概览数据 + 最近档期');
+    var stats = createPrintSection('数据概览');
+    appendPrintKvRows(stats.body, [
+      ['总档期', String(state.events.length)],
+      ['待执行', String(state.events.filter(function(evt){ return evt.status !== '已完成'; }).length)],
+      ['已完成', String(state.events.filter(function(evt){ return evt.status === '已完成'; }).length)],
+      ['客户数', String(uniqueClients().length)]
+    ]);
+    sheet.body.appendChild(stats.section);
+
+    var recent = createPrintSection('最近档期', '按时间顺序显示最近 6 场');
+    appendPrintEventList(recent.body, sortEvents(state.events.slice()).slice(0, 6));
+    sheet.body.appendChild(recent.section);
+    return sheet.root;
+  }
+
+  function createPrintableScheduleNode(){
+    var events = getScheduleExportEvents();
+    var sheet = createPrintSheet('档期打印版', '按月份整理，便于直接查看当月客户');
+    if(!events.length){
+      var emptySec = createPrintSection('档期列表');
+      appendPrintEventList(emptySec.body, []);
+      sheet.body.appendChild(emptySec.section);
+      return sheet.root;
+    }
+    var grouped = {};
+    events.forEach(function(evt){
+      var key = (evt.date || '').slice(0, 7) || '未排期';
+      if(!grouped[key]) grouped[key] = [];
+      grouped[key].push(evt);
+    });
+    Object.keys(grouped).sort().forEach(function(key){
+      var section = createPrintSection((key === '未排期' ? '未排期' : key.replace('-', ' 年 ') + ' 月'), '共 ' + grouped[key].length + ' 场');
+      appendPrintEventList(section.body, grouped[key]);
+      sheet.body.appendChild(section.section);
+    });
+    return sheet.root;
+  }
+
+  function createPrintableClientsNode(){
+    var query = els.clientSearchInput ? String(els.clientSearchInput.value || '').trim() : '';
+    var clients = uniqueClients().filter(function(client){ return matchesClientQuery(client, query); });
+    var sheet = createPrintSheet('客户打印版', query ? ('筛选关键词：' + query) : '客户检索列表');
+    var section = createPrintSection('客户资料', '共 ' + clients.length + ' 位');
+    if(!clients.length){
+      var empty = document.createElement('div');
+      empty.style.fontSize = '12px';
+      empty.style.color = '#64748b';
+      empty.textContent = '没有匹配到客户。';
+      section.body.appendChild(empty);
+    }else{
+      clients.forEach(function(client){
+        var row = document.createElement('div');
+        row.style.border = '1px solid #e5e7eb';
+        row.style.borderRadius = '14px';
+        row.style.padding = '10px 12px';
+        row.innerHTML = '<div style="font-size:13px;font-weight:900;">' + escapeHtml(client.name || '未命名客户') + '</div>' +
+          '<div style="font-size:11px;color:#475569;margin-top:4px;">电话：' + escapeHtml(client.phone || '未填写') + '</div>' +
+          '<div style="font-size:11px;color:#64748b;margin-top:2px;">婚期：' + escapeHtml(formatClientDates(client)) + '</div>' +
+          '<div style="font-size:11px;color:#64748b;margin-top:2px;">地区：' + escapeHtml(client.region || '未填写') + '</div>';
+        section.body.appendChild(row);
+      });
+    }
+    sheet.body.appendChild(section.section);
+    return sheet.root;
+  }
+
+  function createPrintableCustomsNode(evt){
+    var ritualPlan = evt ? getRitualPlan(evt) : [];
+    var ritualState = evt ? getEventCustoms(evt.id) : {};
+    var selectedRegion = els.customsRegionSelect ? (els.customsRegionSelect.value || (evt && evt.region) || '') : ((evt && evt.region) || '');
+    var library = selectedRegion ? getRegionCustoms(selectedRegion) : [];
+    var title = evt ? ((getClientName(evt) || '当前客户') + ' 风俗打印版') : '风俗打印版';
+    var subtitle = evt ? [formatDateCN(evt.date || ''), evt.region || '未设地区', evt.venue || '未填场地'].join(' · ') : (selectedRegion ? ('当前地区：' + selectedRegion) : '当前没有档期');
+    var sheet = createPrintSheet(title, subtitle);
+
+    if(evt){
+      var planSection = createPrintSection('风俗流程', '仅保留勾选与备注，便于直接打印');
+      appendPrintChecklist(planSection.body, ritualPlan, ritualState);
+      sheet.body.appendChild(planSection.section);
+      if(evt.note){
+        var noteSection = createPrintSection('客户备注');
+        appendPrintKvRows(noteSection.body, [['备注', evt.note || '']]);
+        sheet.body.appendChild(noteSection.section);
+      }
+      return sheet.root;
+    }
+
+    var libSection = createPrintSection('地区风俗库');
+    appendPrintChecklist(libSection.body, library, {});
+    sheet.body.appendChild(libSection.section);
+    return sheet.root;
+  }
+
+  function createPrintableWorkspaceNode(evt){
+    var subtitle = [formatDateCN(evt.date || ''), evt.venue || '未填场地', evt.ceremony || '--:--'].join(' · ');
+    var sheet = createPrintSheet((getClientName(evt) || '当前客户') + ' 执行中枢打印版', subtitle);
+
+    var info = createPrintSection('客户摘要', '只保留标题、勾选框与备注');
+    appendPrintKvRows(info.body, [
+      ['婚期', formatDateCN(evt.date || '') || '未填写'],
+      ['场地', evt.venue || '未填写'],
+      ['仪式开始', evt.ceremony || '未填写'],
+      ['宴会类型', evt.banquet || '未填写'],
+      ['地区', evt.region || '未填写'],
+      ['客户备注', evt.note || '无']
+    ]);
+    sheet.body.appendChild(info.section);
+
+    var timeline = createPrintSection('时间流程清单');
+    appendPrintTimeline(timeline.body, getTimelineItems(evt));
+    sheet.body.appendChild(timeline.section);
+
+    var staffInfo = createPrintSection('工作人员信息');
+    appendPrintStaffInfo(staffInfo.body, getStaffInfoItems(evt));
+    sheet.body.appendChild(staffInfo.section);
+
+    var staffChecklist = createPrintSection('工作人员流程清单');
+    appendPrintChecklist(staffChecklist.body, getCheckItems().filter(function(item){ return item.phase === '工作人员'; }), getEventChecks(evt.id));
+    sheet.body.appendChild(staffChecklist.section);
+
+    return sheet.root;
+  }
+
+  function createPrintableChecklistNode(evt){
+    var checkItems = getCheckItems();
+    var stateMap = evt ? getEventChecks(evt.id) : {};
+    var done = 0;
+    checkItems.forEach(function(item){ if(stateMap[item.id]) done += 1; });
+    var title = (evt ? (getClientName(evt) || '当前客户') : '当前客户') + ' 清单打印版';
+    var subtitle = evt ? [formatDateCN(evt.date || ''), evt.venue || '未填场地', '已完成 ' + done + ' / ' + checkItems.length + ' 项'].join(' · ') : '当前没有可绑定档期';
+    var sheet = createPrintSheet(title, subtitle);
+
+    if(!evt){
+      var emptySection = createPrintSection('当前客户清单');
+      appendPrintChecklist(emptySection.body, [], {});
+      sheet.body.appendChild(emptySection.section);
+      return sheet.root;
+    }
+
+    var head = createPrintSection('客户摘要');
+    appendPrintKvRows(head.body, [
+      ['婚期', formatDateCN(evt.date || '') || '未填写'],
+      ['场地', evt.venue || '未填写'],
+      ['地区', evt.region || '未填写'],
+      ['客户备注', evt.note || '无']
+    ]);
+    sheet.body.appendChild(head.section);
+
+    var current = createPrintSection('执行清单', '仅保留标题、勾选框与备注');
+    appendPrintChecklist(current.body, checkItems, stateMap);
+    sheet.body.appendChild(current.section);
+
+    return sheet.root;
+  }
+
+  function getPrintableNodeForCurrentScreen(){
+    var evt = getNextEvent();
+    if(state.ui.activeScreen === 'dashboard'){
+      return { node: createPrintableDashboardNode(), title: '首页打印版' };
+    }
+    if(state.ui.activeScreen === 'schedule'){
+      return { node: createPrintableScheduleNode(), title: '档期打印版' };
+    }
+    if(state.ui.activeScreen === 'clients'){
+      return { node: createPrintableClientsNode(), title: '客户打印版' };
+    }
+    if(state.ui.activeScreen === 'customs'){
+      return { node: createPrintableCustomsNode(evt), title: '风俗打印版' };
+    }
+    if(state.ui.activeScreen === 'workspace'){
+      if(!evt) return null;
+      return { node: createPrintableWorkspaceNode(evt), title: (getClientName(evt) || '当前客户') + ' 执行中枢打印版' };
+    }
+    if(state.ui.activeScreen === 'checklist'){
+      return { node: createPrintableChecklistNode(evt), title: (evt ? (getClientName(evt) || '当前客户') : '当前客户') + ' 清单打印版' };
+    }
+    return null;
+  }
+
+  function exportPrintNode(node, filename, onError){
+    var cleanup = mountNodeForCapture(node);
+    return nodeToPngBlob(node, { printMode:true }).then(function(blob){
+      if(cleanup) cleanup();
+      downloadBlob(blob, filename);
+    }).catch(function(err){
+      if(cleanup) cleanup();
+      throw err;
+    });
+  }
+
+  function exportCurrentPageImage(){
+    var config = getPrintableNodeForCurrentScreen();
+    if(config && config.node){
+      exportPrintNode(config.node, safeFileName((config.title || '当前页打印版') + '-' + todayKey()) + '.png').catch(function(err){
+        alert('导出当前页图片失败：' + (err && err.message ? err.message : '请重试'));
+      });
+      return;
+    }
+    var screen = document.getElementById('screen-' + state.ui.activeScreen);
+    if(!screen){
+      alert('当前页还不能导出。');
+      return;
+    }
+    var restore = prepareNodeCapture(screen);
+    nodeToPngBlob(screen, { title: (els.currentTitle ? els.currentTitle.textContent : '当前页') + ' 页面截图', removeSelectors:['.rowEditBtn', '.rowAddBtn', '.checkGroupAddBtn', '.checkInlineEditor', '.timelineActionBtn', '.timelineInlineEditor'] }).then(function(blob){
+      if(restore) restore();
+      downloadBlob(blob, safeFileName((els.currentTitle ? els.currentTitle.textContent : '当前页') + '-页面截图-' + todayKey()) + '.png');
+    }).catch(function(err){
+      if(restore) restore();
+      alert('导出当前页图片失败：' + (err && err.message ? err.message : '请重试'));
+    });
+  }
+
+  function exportClientWorkspaceImage(){
+    var evt = getNextEvent();
+    if(!evt){
+      alert('还没有当前客户可导出。');
+      return;
+    }
+    exportPrintNode(
+      createPrintableWorkspaceNode(evt),
+      safeFileName((getClientName(evt) || '当前客户') + '-执行中枢打印版-' + todayKey()) + '.png'
+    ).catch(function(err){
+      alert('导出客户执行中枢图片失败：' + (err && err.message ? err.message : '请重试'));
+    });
+  }
+
+  function exportClientChecklistImage(){
+    var evt = getNextEvent();
+    exportPrintNode(
+      createPrintableChecklistNode(evt),
+      safeFileName(((evt ? (getClientName(evt) || '当前客户') : '当前客户') + '-清单打印版-' + todayKey())) + '.png'
+    ).catch(function(err){
+      alert('导出客户清单图片失败：' + (err && err.message ? err.message : '请重试'));
+    });
+  }
+
+  function exportState(){
+
+    var payload = {
+      version: 8,
+      exportedAt: new Date().toISOString(),
+      events: state.events,
+      checksByEvent: state.checksByEvent,
+      customsByEvent: state.customsByEvent,
+      templateChecks: state.templateChecks,
+      checkItems: state.checkItems,
+      regionCustoms: state.regionCustoms
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    downloadBlob(blob, safeFileName(getBrandName() + '-移动端数据-' + todayKey()) + '.json');
+  }
+
+  function importStateFromFile(file){
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var parsed = JSON.parse(reader.result);
+        if(!parsed || !Array.isArray(parsed.events)) throw new Error('bad payload');
+        state.events = parsed.events;
+        state.checksByEvent = parsed.checksByEvent && typeof parsed.checksByEvent === 'object' ? parsed.checksByEvent : {};
+        state.customsByEvent = parsed.customsByEvent && typeof parsed.customsByEvent === 'object' ? parsed.customsByEvent : {};
+        state.checkItems = buildCheckItems(parsed.checkItems);
+        state.templateChecks = parsed.templateChecks && typeof parsed.templateChecks === 'object' ? parsed.templateChecks : defaultTemplateCheckState();
+        state.regionCustoms = buildRegionCustoms(parsed.regionCustoms);
+        syncChecklistMaps();
+        saveState();
+        refreshAll();
+        alert('导入成功。');
+      }catch(err){
+        alert('导入失败：文件格式不正确。');
+      }
+      els.importFile.value = '';
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  function clearAll(){
+    if(!confirm('确认清空全部本地数据吗？此操作不可撤销。')) return;
+    state.events = [];
+    state.checksByEvent = {};
+    state.customsByEvent = {};
+    state.checkItems = buildCheckItems();
+    state.templateChecks = defaultTemplateCheckState();
+    state.regionCustoms = buildRegionCustoms();
+    saveState();
+    refreshAll();
+    closeModal('data');
+  }
+
+  function refreshAll(){
+    renderBrandName();
+    renderStats();
+    updateClientSelect(document.getElementById('e_client').value);
+    renderRecentEvents();
+    renderSchedule();
+    renderClients();
+    renderWorkspace();
+    renderCustoms();
+    renderTemplateChecklist();
+    refreshDataCenter();
+  }
+
+  function uid(){
+    return 'evt_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+  }
+
+  function escapeHtml(str){
+    return String(str == null ? '' : str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function cssEscapeAttr(value){
+    return String(value == null ? '' : value).replace(/\\/g,'\\\\').replace(/"/g,'\\\"');
+  }
+
+  function attachInputDirtyFlag(){
+    document.querySelectorAll('input,select,textarea').forEach(function(el){
+      if(el.id === 'importFile') return;
+      el.addEventListener('input', markDirty);
+      el.addEventListener('change', function(){
+        markDirty();
+        if(el.id === 'e_client') toggleNewClientWrap();
+      });
+    });
+  }
+
+  function wireEvents(){
+    document.querySelectorAll('.navBtn').forEach(function(btn){
+      btn.addEventListener('click', function(){ switchScreen(btn.getAttribute('data-screen')); });
+    });
+
+    document.querySelectorAll('[data-quick]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var action = btn.getAttribute('data-quick');
+        if(action === 'new-event') startNewEvent();
+        if(action === 'workspace') switchScreen('workspace');
+        if(action === 'customs') switchScreen('customs');
+        if(action === 'data-center') openModal('data');
+        if(action === 'schedule') switchScreen('schedule');
+      });
+    });
+
+    document.querySelectorAll('.filterBtn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        state.ui.activeFilter = btn.getAttribute('data-filter');
+        document.querySelectorAll('.filterBtn').forEach(function(node){ node.classList.toggle('active', node === btn); });
+        renderSchedule();
+      });
+    });
+
+    els.menuBtn.addEventListener('click', openSheet);
+    els.closeMenuSheet.addEventListener('click', closeSheet);
+    els.menuSheet.addEventListener('click', function(e){ if(e.target === els.menuSheet) closeSheet(); });
+    document.querySelectorAll('[data-sheet-action]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var action = btn.getAttribute('data-sheet-action');
+        closeSheet();
+        if(action === 'new-event') startNewEvent();
+        if(action === 'save') saveState();
+        if(action === 'export') exportState();
+        if(action === 'import') els.importFile.click();
+        if(action === 'export-page-image') exportCurrentPageImage();
+        if(action === 'export-workspace-image') exportClientWorkspaceImage();
+        if(action === 'export-checklist-image') exportClientChecklistImage();
+        if(action === 'customs') switchScreen('customs');
+        if(action === 'data-center') openModal('data');
+        if(action === 'about') alert('这是最新移动端独立版：\n1. 图片导出已细化为 A4 纵向打印排版\n2. 默认按单客户生成打印版\n3. 清单与执行中枢只保留标题、勾选框和备注\n4. 内容过长时会自动导出高清长图');
+      });
+    });
+
+    els.saveBtn.addEventListener('click', function(){ saveState(); });
+    els.addEventBtnTop.addEventListener('click', startNewEvent);
+
+    els.closeEventModalBtn.addEventListener('click', function(){ closeModal('event'); });
+    els.closeDataCenterBtn.addEventListener('click', function(){ closeModal('data'); });
+    els.doneDataCenterBtn.addEventListener('click', function(){ closeModal('data'); });
+    els.eventModalWrap.addEventListener('click', function(e){ if(e.target === els.eventModalWrap) closeModal('event'); });
+    els.dataCenterWrap.addEventListener('click', function(e){ if(e.target === els.dataCenterWrap) closeModal('data'); });
+
+    els.prevStepBtn.addEventListener('click', function(){ setStep(state.ui.step - 1); renderStepper(); });
+    els.nextStepBtn.addEventListener('click', function(){ setStep(state.ui.step + 1); renderStepper(); });
+    els.saveEventBtn.addEventListener('click', saveEvent);
+    els.deleteEventBtn.addEventListener('click', deleteEvent);
+
+    els.exportBtn.addEventListener('click', exportState);
+    els.importBtn.addEventListener('click', function(){ els.importFile.click(); });
+    els.importFile.addEventListener('change', function(){ importStateFromFile(els.importFile.files[0]); });
+    els.clearDataBtn.addEventListener('click', clearAll);
+
+    if(els.templateToggleBtn){
+      els.templateToggleBtn.addEventListener('click', toggleTemplateLibrary);
+    }
+
+    if(els.brandNameDisplay){
+      els.brandNameDisplay.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          els.brandNameDisplay.blur();
+        }
+      });
+      els.brandNameDisplay.addEventListener('blur', saveBrandNameFromEditor);
+      els.brandNameDisplay.addEventListener('paste', function(e){
+        e.preventDefault();
+        var text = '';
+        if(e.clipboardData && e.clipboardData.getData) text = e.clipboardData.getData('text/plain');
+        document.execCommand('insertText', false, text);
+      });
+    }
+
+    els.resetChecklistBtn.addEventListener('click', function(){
+      state.templateChecks = defaultTemplateCheckState();
+      saveState();
+      renderTemplateChecklist();
+      renderWorkspace();
+    });
+    if(els.addChecklistItemBtn){
+      els.addChecklistItemBtn.addEventListener('click', function(){ promptChecklistItemEditor(); });
+    }
+    if(els.exportCurrentPageBtn){
+      els.exportCurrentPageBtn.addEventListener('click', exportCurrentPageImage);
+    }
+    if(els.exportClientChecklistBtn){
+      els.exportClientChecklistBtn.addEventListener('click', exportClientChecklistImage);
+    }
+    els.copyChecklistBtn.addEventListener('click', function(){
+      var evt = getNextEvent();
+      if(!evt){ alert('还没有可同步的档期。'); return; }
+      state.checksByEvent[evt.id] = Object.assign({}, state.templateChecks);
+      saveState();
+      refreshAll();
+      alert('已同步到当前档期。');
+    });
+
+    if(els.addRegionBtn){
+      els.addRegionBtn.addEventListener('click', addRegionLibrary);
+    }
+    if(els.addCustomBtn){
+      els.addCustomBtn.addEventListener('click', addCustomToRegion);
+    }
+    if(els.customsRegionSelect){
+      els.customsRegionSelect.addEventListener('change', function(){
+        renderCustoms();
+      });
+    }
+
+    if(els.clientSearchInput){
+      els.clientSearchInput.addEventListener('input', function(){
+        renderClients();
+      });
+    }
+
+    window.addEventListener('resize', function(){ renderStats(); renderWorkspace(); renderCustoms(); });
+    window.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        closeSheet();
+        closeModal('event');
+        closeModal('data');
+      }
+    });
+  }
+
+  bind();
+  loadState();
+  renderBrandName();
+  renderStepper();
+  attachInputDirtyFlag();
+  wireEvents();
+  resetForm();
+  refreshAll();
+  switchScreen('dashboard');
+  showSaved(state.events.length ? '已加载' : '未保存');
+})();
+</script>
+</body>
+</html>
