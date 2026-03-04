@@ -480,9 +480,9 @@ body.sheet-open,body.modal-open{overflow:hidden;}
           <button class="sheetAction" data-sheet-action="save"><div class="aTitle">保存</div><div class="aDesc">立即写入本地存储。</div></button>
           <button class="sheetAction" data-sheet-action="export"><div class="aTitle">导出数据</div><div class="aDesc">导出 JSON 备份。</div></button>
           <button class="sheetAction" data-sheet-action="import"><div class="aTitle">导入</div><div class="aDesc">导入之前的数据。</div></button>
-          <button class="sheetAction" data-sheet-action="export-page-image"><div class="aTitle">导出当前页图片</div><div class="aDesc">把你正在看的页面导出成 PNG。</div></button>
-          <button class="sheetAction" data-sheet-action="export-workspace-image"><div class="aTitle">导出客户执行中枢图片</div><div class="aDesc">导出当前客户的执行中枢页面。</div></button>
-          <button class="sheetAction" data-sheet-action="export-checklist-image"><div class="aTitle">导出客户清单图片</div><div class="aDesc">导出当前客户关联清单。</div></button>
+          <button class="sheetAction" data-sheet-action="export-page-image"><div class="aTitle">打印当前页 / 保存 PDF</div><div class="aDesc">打开打印模式，可直接保存为 PDF。</div></button>
+          <button class="sheetAction" data-sheet-action="export-workspace-image"><div class="aTitle">打印客户执行中枢 / 保存 PDF</div><div class="aDesc">打开当前客户执行中枢的打印模式。</div></button>
+          <button class="sheetAction" data-sheet-action="export-checklist-image"><div class="aTitle">打印客户清单 / 保存 PDF</div><div class="aDesc">打开当前客户清单的打印模式。</div></button>
           <button class="sheetAction" data-sheet-action="customs"><div class="aTitle">风俗方案</div><div class="aDesc">跳转到风俗流程页。</div></button>
           <button class="sheetAction" data-sheet-action="data-center"><div class="aTitle">数据中心</div><div class="aDesc">查看数量与状态。</div></button>
           <button class="sheetAction" data-sheet-action="about"><div class="aTitle">当前版本</div><div class="aDesc">查看本轮改造说明。</div></button>
@@ -2696,38 +2696,60 @@ body.sheet-open,body.modal-open{overflow:hidden;}
     return null;
   }
 
-  function exportPrintNode(node, filename, onError){
-    var cleanup = mountNodeForCapture(node);
-    return nodeToPngBlob(node, { printMode:true }).then(function(blob){
-      if(cleanup) cleanup();
-      downloadBlob(blob, filename);
-    }).catch(function(err){
-      if(cleanup) cleanup();
-      throw err;
-    });
+
+  function preparePrintNodeForWindow(node){
+    if(!node) return '';
+    var clone = node.cloneNode(true);
+    syncCloneFormState(node, clone);
+    clone.style.width = '100%';
+    clone.style.maxWidth = '190mm';
+    clone.style.minHeight = 'auto';
+    clone.style.margin = '0 auto';
+    clone.style.border = 'none';
+    clone.style.borderRadius = '0';
+    clone.style.boxShadow = 'none';
+    clone.style.overflow = 'visible';
+    clone.querySelectorAll('.rowEditBtn, .rowAddBtn, .checkGroupAddBtn, .checkInlineEditor, .timelineActionBtn, .timelineInlineEditor, .sheetAction, .primaryBtn, .secondaryBtn, .ghostBtn').forEach(function(el){ el.remove(); });
+    return clone.outerHTML;
+  }
+
+  function openPrintPreview(node, title){
+    if(!node){
+      alert('没有可打印的内容。');
+      return false;
+    }
+    var printHtml = preparePrintNodeForWindow(node);
+    var win = window.open('', '_blank');
+    if(!win){
+      alert('浏览器拦截了打印窗口，请允许弹窗后重试。');
+      return false;
+    }
+    var docTitle = title || '打印导出';
+    var page = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + escapeHtml(docTitle) + '</title>' +
+      '<style>' +
+      '@page{size:A4 portrait;margin:10mm;}' +
+      'html,body{margin:0;padding:0;background:#fff;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;}' +
+      'body{padding:0;}' +
+      '.print-shell{width:100%;max-width:210mm;margin:0 auto;box-sizing:border-box;}' +
+      '.print-shell *{box-sizing:border-box;}' +
+      '@media screen{body{background:#e5e7eb;padding:16px;}.print-shell{background:#fff;min-height:100vh;box-shadow:0 8px 28px rgba(15,23,42,.08);}}' +
+      '@media print{body{padding:0;background:#fff;}.print-shell{max-width:none;box-shadow:none;} button{display:none !important;}}' +
+      '</style></head><body><div class="print-shell">' + printHtml + '</div>' +
+      '<script>window.addEventListener("load",function(){setTimeout(function(){try{window.focus();window.print();}catch(e){}},180);});<\/script>' +
+      '</body></html>';
+    win.document.open();
+    win.document.write(page);
+    win.document.close();
+    return true;
   }
 
   function exportCurrentPageImage(){
     var config = getPrintableNodeForCurrentScreen();
     if(config && config.node){
-      exportPrintNode(config.node, safeFileName((config.title || '当前页打印版') + '-' + todayKey()) + '.png').catch(function(err){
-        alert('导出当前页图片失败：' + (err && err.message ? err.message : '请重试'));
-      });
+      openPrintPreview(config.node, config.title || '当前页打印版');
       return;
     }
-    var screen = document.getElementById('screen-' + state.ui.activeScreen);
-    if(!screen){
-      alert('当前页还不能导出。');
-      return;
-    }
-    var restore = prepareNodeCapture(screen);
-    nodeToPngBlob(screen, { title: (els.currentTitle ? els.currentTitle.textContent : '当前页') + ' 页面截图', removeSelectors:['.rowEditBtn', '.rowAddBtn', '.checkGroupAddBtn', '.checkInlineEditor', '.timelineActionBtn', '.timelineInlineEditor'] }).then(function(blob){
-      if(restore) restore();
-      downloadBlob(blob, safeFileName((els.currentTitle ? els.currentTitle.textContent : '当前页') + '-页面截图-' + todayKey()) + '.png');
-    }).catch(function(err){
-      if(restore) restore();
-      alert('导出当前页图片失败：' + (err && err.message ? err.message : '请重试'));
-    });
+    alert('当前页还不能导出。');
   }
 
   function exportClientWorkspaceImage(){
@@ -2736,22 +2758,18 @@ body.sheet-open,body.modal-open{overflow:hidden;}
       alert('还没有当前客户可导出。');
       return;
     }
-    exportPrintNode(
+    openPrintPreview(
       createPrintableWorkspaceNode(evt),
-      safeFileName((getClientName(evt) || '当前客户') + '-执行中枢打印版-' + todayKey()) + '.png'
-    ).catch(function(err){
-      alert('导出客户执行中枢图片失败：' + (err && err.message ? err.message : '请重试'));
-    });
+      (getClientName(evt) || '当前客户') + ' 执行中枢打印版'
+    );
   }
 
   function exportClientChecklistImage(){
     var evt = getNextEvent();
-    exportPrintNode(
+    openPrintPreview(
       createPrintableChecklistNode(evt),
-      safeFileName(((evt ? (getClientName(evt) || '当前客户') : '当前客户') + '-清单打印版-' + todayKey())) + '.png'
-    ).catch(function(err){
-      alert('导出客户清单图片失败：' + (err && err.message ? err.message : '请重试'));
-    });
+      ((evt ? (getClientName(evt) || '当前客户') : '当前客户') + ' 清单打印版')
+    );
   }
 
   function exportState(){
